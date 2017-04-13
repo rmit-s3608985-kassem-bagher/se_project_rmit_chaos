@@ -1,10 +1,11 @@
 package se_project_rmit_chaos;
 
 public class Employee {
-    String name;
-    String username;
-    String password;
-    EmployeeRole role;
+    private String name;
+    private int id;
+    private String username;
+    private String password;
+    private EmployeeRole role;
     boolean loggedIn;
 
     Employee(String username, String password) {
@@ -13,21 +14,21 @@ public class Employee {
 	this.username = username;
 	this.password = password;
 	this.loggedIn = false;
+	this.id = 0;
 	if (login(username, password)) {
 	    System.out.println("Employee Created and logged in");
-	}
-	else
-	{
+	} else {
 	    System.err.println("Employee Created but could not login!\nYou need to call the login function");
 	}
     }
 
     public boolean login(String username, String password) {
-	// TODO: call login API and fill the data from the response
-	this.name = ""; 
+	// TODO: call employee login API and fill the data from the response
+	this.name = "";
 	this.loggedIn = true;
-	int role=1; 
-	
+	this.id = 1;
+	int role = 1;
+
 	// determine employee's role
 	switch (role) {
 	case 1: // manager
@@ -42,23 +43,20 @@ public class Employee {
 	default:
 	    break;
 	}
-	
-	// operation status 
+
+	// operation status
 	if (this.loggedIn) {
 	    return true;
 	}
 	return false;
     }
 
+    public boolean isLoggedIn() {
+	return this.loggedIn;
+    }
+
     public String getName() {
 	return name;
     }
-
-    public String getUsername() {
-	return username;
-    }
-
-    public String getPassword() {
-	return password;
-    }
+    
 }
