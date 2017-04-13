@@ -1,137 +1,120 @@
 package se_project_rmit_chaos;
 
 import java.util.*;
-class Order 
-{
-   protected String ID;
-   protected Date d;
-   protected double price; 
-   protected Customer cust;
-   private ArrayList<OrderLine> list = new ArrayList<OrderLine>();
-   private Scanner scan = new Scanner(System.in);
-   private Invoice inv;
-   private Payment payment;
-   private char status;
 
-   public String getID() { return ID; }
-   public char getStatus(){ return status; }
+class Order {
+    private int id;
+    private long date;
+    private double total; // after applying discount
+    private double subtotal; // before discount
+    private double pointsDiscount; // customer's points discount
+    private Customer customer;
+    private ArrayList<OrderItem> orderItems = new ArrayList<OrderItem>();
+    private OrderStatus status = OrderStatus.pending;
 
-   public Date getDate(){ return d;}
+    public int getID() {
+	return id;
+    }
 
-   public void print()
-   {
-      computePrice();
-      System.out.printf("%-20s %-20s\n","ID",ID);
-      System.out.printf("%-20s %-20s\n","Customer",cust.getName());
-      System.out.printf("%-20s %-20s\n\n","Date",d.toString());
-      for (int i=0; i<list.size(); i++)
-        list.get(i).print();
-      System.out.printf("\n%-20s %-20s\n","total price",price);
-      System.out.printf("%-20s %-20c\n","Status",status);
-      if ( status == 'D' || status == 'F')
-      {
-          System.out.printf("%-20s %-20s\n","invoice ID",inv.getID());
-          System.out.printf("%-20s %-20s\n","invoice Date",
-					inv.getDate().toString());
-      }
-      if ( status == 'F')
-      {
-          System.out.printf("%-20s %-20s\n",
-				"Payment Date",payment.getDate().toString());
-          System.out.printf("%-20s %-20s\n",
-				"Payment Type",payment.getType());
-      }
-   }
+    public long getDate() {
+	return date;
+    }
 
+    public Order(Customer customer) {
+	this.customer = customer;
+    }
 
-   public Order(Date d, String ID,Customer c,Product ps[],int qtys[]) 
-   {
-       this.d = d;
-       this.ID = ID;
-       cust = c; 
-       for (int i=0; i<ps.length; i++)
-          list.add(new OrderLine(ps[i],qtys[i],this));
-   }
+    private void computeTotal() {
+	this.subtotal = 0;
+	// calculate subtotal
+	for (int i = 0; i < this.orderItems.size(); i++)
+	    this.subtotal += this.orderItems.get(i).getPrice();
+	// calculate points discount
+	this.pointsDiscount = this.customer.getPointsDiscount(this.subtotal);
+	// calculate total
+	this.total = this.subtotal - this.pointsDiscount;
+    }
 
-   public Order(ArrayList<Customer> cList, ArrayList<Product> pList)
-   {
-        d = MyDate.getDate("Enter date of Order: ");
-        System.out.print("Enter Order ID : ");
-        ID = scan.nextLine();
-        for (int i=0; i<cList.size(); i++)
-           System.out.println("  " + i + "  " + cList.get(i).getName());    
-        int i;  
-        do {      
-             System.out.print("Enter Customer index : ");
-             i = scan.nextInt();
-        } while ( i  < 0 || i >= cList.size());
-        cust = cList.get(i);
-        String resp;       
-        do {
-           for ( i=0; i<pList.size(); i++)
-              System.out.println("   " + i + "   "
-				 + pList.get(i).getName());
-           do {      
-             System.out.print("Enter Product index : ");
-             i = scan.nextInt();
-           } while ( i  < 0 || i >= pList.size());
-           System.out.print("Enter 	qty : ");
-           int qty = scan.nextInt();
-           list.add(new OrderLine(pList.get(i),qty,this));
-           scan.nextLine();
-           System.out.print("Any more items ? : Y/N");
-           resp = scan.nextLine();
-        }  while (   resp.compareTo("Y") == 0);       
-        status = 'W';   
-   }
+    public boolean addProduct(Product pr, double qty) {
+	if (this.status == OrderStatus.placed) {
+	    System.err.println("Cannot add products to already placed orders");
+	    return false;
+	}
+	if (this.status == OrderStatus.canceled) {
+	    System.err.println("Cannot add products to a canceled order");
+	    return false;
+	}
+	if (qty > pr.getStockLevel()) {
+	    System.err.println("only " + pr.getStockLevel() + " products remaining");
+	    return false;
+	}
 
-   public void computePrice()
-   {
-           price = 0;
-           for (int i=0; i<list.size(); i++)
-              price += list.get(i).getPrice(); 
-           price -= getDiscount(price);
-   }
+	OrderItem item = new OrderItem(pr, qty, this);
+	this.orderItems.add(item);
+	return true;
+    }
 
-   public double getDiscount(double price)
-   {
-//       double disc = cust.getDisVal(price);
-       double disc = 0;
-       return disc;
-   }
-   public void despatch()
-   {
-        if (status == 'W')
-        {
-           computePrice();
-           Date date = new Date();
-           inv = new Invoice(date,this);
-           status = 'D';
-        } 
-        else System.out.println("Attempt to despatch failed");
-   }
+    public boolean removeProduct(OrderItem item) {
+	if (this.status == OrderStatus.canceled) {
+	    System.err.println("Cannot remove products to a canceled order");
+	    return false;
+	}
+	this.orderItems.remove(item);
+	return true;
+    }
 
-   public void cancel()
-   {
-      if (status == 'W')
-      {
-         status = 'C';
-         System.out.println("Order Cancelled");
-      }
-      else System.out.println("Attempt to cancel failed");    
-   }
+    public boolean cancelOrder() {
+	if (this.status == OrderStatus.canceled) {
+	    System.err.println("order canceled already ");
+	    return false;
+	}
+	if (this.status == OrderStatus.pending) {
+	    System.err.println("cannot cancel pending orders.\nOrder must be placed first");
+	    return false;
+	}
+	// TODO: call the API and complete on success (server will do similar
+	// logic)
+	if (this.status == OrderStatus.pending) { // no deduction or anything
+	    this.status = OrderStatus.canceled;
+	    return true;
+	} else if (this.status == OrderStatus.placed) {
+	    this.status = OrderStatus.canceled;
+	    this.customer.increaseBalance(this.total);
+	    this.customer.addPoints(this.subtotal);
+	    for (OrderItem oi : orderItems) {
+		oi.getProduct().increaseStockLevel(oi.getQuantity());
+	    }
+	    return true;
+	}
 
-   public void receive(String type)
-   {
-        if (status == 'D')
-        {
-           Date date = new Date();
-           payment = new Payment(date,this,type);
-           status = 'F';
-       } 
-       else System.out.println("Attempt to receive payment failed");    
+	return false;
+    }
 
-   }
+    public boolean placeOrder() {
+	/*
+	 * TODO: call API (first check with server for stock level) add items to
+	 * order update total deduct user's balance deduct user's points
+	 * decrease stock level
+	 */
+	if (this.status != OrderStatus.pending) {
+	    System.err.println("order needs to be pending");
+	    return false;
+	}
+	computeTotal();
+	// check if customer has enough balance
+	if (this.total > this.customer.getBalance() && this.total > this.customer.getPointsDiscount(this.subtotal)) {
+	    System.err.println("no enough balance or points");
+	    return false;
+	}
+
+	// TODO: call API to place order, on success, complete the below steps
+	this.customer.deductBalance(this.total);
+	this.customer.deductPoints(subtotal);
+	for (OrderItem oi : orderItems) {
+	    oi.getProduct().decreaseStockLevel(oi.getQuantity());
+	}
+	this.status = OrderStatus.placed;
+	return true;
+    }
 
 }
-

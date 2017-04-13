@@ -1,12 +1,12 @@
 package se_project_rmit_chaos;
 
 public class Employee {
-    private String name;
-    private int id;
-    private String username;
-    private String password;
+    private String name = "";
+    private int id = 0;
+    private String username = "";
+    private String password = "";
     private EmployeeRole role;
-    boolean loggedIn;
+    boolean loggedIn = false;
 
     Employee(String username, String password) {
 	this.name = "";
@@ -51,6 +51,10 @@ public class Employee {
 	return false;
     }
 
+    public EmployeeRole getRole() {
+	return this.role;
+    }
+
     public boolean isLoggedIn() {
 	return this.loggedIn;
     }
@@ -58,5 +62,5 @@ public class Employee {
     public String getName() {
 	return name;
     }
-    
+
 }

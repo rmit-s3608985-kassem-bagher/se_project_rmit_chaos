@@ -63,6 +63,19 @@ public class Product {
 	return true;
     }
     
+    public double increaseStockLevel(double quantity){
+	// TODO: call the update stock level on the server
+	
+	this.stockLevel += quantity;
+	return this.stockLevel ;
+    }
+    
+    public double decreaseStockLevel(double quantity){
+	// TODO: call the update stock level on the server
+	this.stockLevel -= quantity;
+	return this.stockLevel ;
+    }
+    
 
     public double getUnitPrice() {
 	return this.unitPrice;
@@ -100,7 +113,7 @@ public class Product {
 	discounts.remove(discounts);
 	return true;
     }
-
+    
     public ArrayList<Discount> getDiscounts(){
 	return discounts;
     }
