@@ -258,7 +258,7 @@ public class Company
 		waitForRes(); 
         }
         else if ( ch == '1' && employee != null && 
-				!(employee instanceof Manager) ) 
+				!(employee.role==EmployeeRole.Manager) ) 
         { System.out.print("Login as Manager to Add Order"); 
           waitForRes(); } 
           else {
@@ -297,9 +297,9 @@ public class Company
         prods.add(new Product("Axle",15,10,50));
         prods.add(new Product("Compressor",40,30,40));
 
-        emps.add(new WarehouseStaff("Charles Theva", "Charles", "pass"));
-        emps.add(new SalesStaff("Craig Cooper", "Craig", "pass"));
-        emps.add(new Manager("Phil Vines", "Phil", "pass"));
+        emps.add(new Employee("Charles", "pass"));
+        emps.add(new Employee("Craig", "pass"));
+        emps.add(new Employee("Phil", "pass"));
 
    }
 }

@@ -7,14 +7,19 @@ public class Employee {
     EmployeeRole role;
     boolean loggedIn;
 
-    Employee(String name, String username, String password, EmployeeRole role) {
-	this.name = name;
+    Employee(String username, String password) {
+	this.name = "";
+	this.role = null;
 	this.username = username;
 	this.password = password;
-	this.role = role;
 	this.loggedIn = false;
-	login(username, password);
-	System.out.println("Employee Created");
+	if (login(username, password)) {
+	    System.out.println("Employee Created and logged in");
+	}
+	else
+	{
+	    System.err.println("Employee Created but could not login!\nYou need to call the login function");
+	}
     }
 
     public boolean login(String username, String password) {
