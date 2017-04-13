@@ -5,12 +5,44 @@ public class Employee {
     String username;
     String password;
     EmployeeRole role;
-    
-    Employee(String name, String username, String password,EmployeeRole role) {
+    boolean loggedIn;
+
+    Employee(String name, String username, String password, EmployeeRole role) {
 	this.name = name;
 	this.username = username;
 	this.password = password;
 	this.role = role;
+	this.loggedIn = false;
+	login(username, password);
+	System.out.println("Employee Created");
+    }
+
+    public boolean login(String username, String password) {
+	// TODO: call login API and fill the data from the response
+	this.name = ""; 
+	this.loggedIn = true;
+	int role=1; 
+	
+	// determine employee's role
+	switch (role) {
+	case 1: // manager
+	    this.role = EmployeeRole.Manager;
+	    break;
+	case 2: // sales
+	    this.role = EmployeeRole.Sales;
+	    break;
+	case 3: // warehouse
+	    this.role = EmployeeRole.Warehouse;
+	    break;
+	default:
+	    break;
+	}
+	
+	// operation status 
+	if (this.loggedIn) {
+	    return true;
+	}
+	return false;
     }
 
     public String getName() {
