@@ -95,7 +95,8 @@ class Order
 
    public double getDiscount(double price)
    {
-       double disc = cust.getDisVal(price);
+//       double disc = cust.getDisVal(price);
+       double disc = 0;
        return disc;
    }
    public void despatch()
