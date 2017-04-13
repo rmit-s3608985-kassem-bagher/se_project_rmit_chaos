@@ -214,7 +214,7 @@ public class Company
       if ( orders.size() == 0)
          System.out.println("No current orders");
       else  
-         System.out.println("Printing orders total number of orders="  			+ orders.size());                     
+         System.out.println("Printing orders total number of orders=" + orders.size());                     
       for (int i=0; i<orders.size(); i++)
       {
           System.out.println("Order " + (i + 1));
@@ -297,8 +297,8 @@ public class Company
         prods.add(new Product("Axle",15,10,50));
         prods.add(new Product("Compressor",40,30,40));
 
-        emps.add(new Employee("Charles Theva", "Charles", "pass"));
-        emps.add(new Employee("Craig Cooper", "Craig", "pass"));
+        emps.add(new WarehouseStaff("Charles Theva", "Charles", "pass"));
+        emps.add(new SalesStaff("Craig Cooper", "Craig", "pass"));
         emps.add(new Manager("Phil Vines", "Phil", "pass"));
 
    }
