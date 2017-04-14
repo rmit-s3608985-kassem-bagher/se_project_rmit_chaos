@@ -113,6 +113,7 @@ class Order {
 	for (OrderItem oi : orderItems) {
 	    oi.getProduct().decreaseStockLevel(oi.getQuantity());
 	}
+	this.date = System.currentTimeMillis() /1000l;
 	this.status = OrderStatus.placed;
 	return true;
     }
