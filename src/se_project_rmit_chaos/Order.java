@@ -12,16 +12,21 @@ class Order {
     private ArrayList<OrderItem> orderItems = new ArrayList<OrderItem>();
     private OrderStatus status = OrderStatus.pending;
 
+    public Order(Customer customer) {
+	this.customer = customer;
+	/*
+	 *  call API and place order
+	 *  get order id from API
+	 */
+	this.id = 1; // get from server
+    }
+
     public int getID() {
 	return id;
     }
 
     public long getDate() {
 	return date;
-    }
-
-    public Order(Customer customer) {
-	this.customer = customer;
     }
 
     private void computeTotal() {
@@ -95,6 +100,8 @@ class Order {
 	 * TODO: call API (first check with server for stock level) add items to
 	 * order update total deduct user's balance deduct user's points
 	 * decrease stock level
+	 * if equals or below replenish level, place order automatically
+	 * App should sync data everytime user goes back to menu 
 	 */
 	if (this.status != OrderStatus.pending) {
 	    System.err.println("order needs to be pending");
@@ -113,7 +120,7 @@ class Order {
 	for (OrderItem oi : orderItems) {
 	    oi.getProduct().decreaseStockLevel(oi.getQuantity());
 	}
-	this.date = System.currentTimeMillis() /1000l;
+	this.date = System.currentTimeMillis() / 1000l;
 	this.status = OrderStatus.placed;
 	return true;
     }

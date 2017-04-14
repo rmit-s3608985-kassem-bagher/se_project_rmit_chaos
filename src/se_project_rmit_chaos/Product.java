@@ -44,8 +44,9 @@ public class Product {
 	return this.unitPrice;
     }
     
-    public boolean editUnitPrice() {
+    public boolean editUnitPrice(double newPrice) {
 	// TODO: call edit product price API
+	this.unitPrice = newPrice;
 	return true;
     }
 

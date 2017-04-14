@@ -1,14 +1,11 @@
 package se_project_rmit_chaos;
 
-public class OrderItem {
-    private double quantity;
-    private Product product;
+public class OrderItem extends Item {
     private Order order;
     private double total;
 
     public OrderItem(Product p, double qty, Order order) {
-	this.product = p;
-	this.quantity = qty;
+	super(qty, p);
 	this.order = order;
     }
 
@@ -16,16 +13,10 @@ public class OrderItem {
 	return order;
     }
 
-    public Product getProduct() {
-	return product;
-    }
-
-    public double getQuantity() {
-	return quantity;
-    }
-
+    @Override
     public double getPrice() {
-	double val = (this.product.getProductPrice() * this.quantity) - getBulkPrice();
+	double val = super.getPrice() - getBulkPrice();
+	this.total = val;
 	return val;
     }
 
