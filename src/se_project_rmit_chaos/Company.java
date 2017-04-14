@@ -67,7 +67,20 @@ public class Company
 //
    public static void main(String args[])
    {
-       
+//	ArrayList<Product> prs = Product.fetchProductsFromServer();
+//	Customer cu = new Customer("Kassem", "aaa");
+//	Order or = new Order(cu);
+//	or.addProduct(prs.get(0), 12);
+//	or.addProduct(prs.get(3), 3);
+//	System.out.println(prs.get(0).getStockLevel());
+//	or.placeOrder();
+//	
+//	cu.increaseBalance(20);
+//	Order or2 = new Order(cu);
+//	System.out.println(prs.get(0).getStockLevel());
+//	or2.addProduct(prs.get(0), 8);
+//	or2.placeOrder();
+//	System.out.println(prs.get(0).getStockLevel());
 //       Company f = new Company();
 //       f.go();
    }

@@ -6,12 +6,12 @@ public class Product {
     private int id;
     private String name;
     private double unitPrice;
-    private double stockLevel;
+    private int stockLevel;
     private double replenishLevel;
     private UnitType type;
-    private ArrayList<Discount> discounts;
+    private ArrayList<Discount> discounts = new ArrayList<Discount>();
     
-    public Product(int id, String name, double unitPrice, double stockLevel, double replenishLevel, UnitType type,ArrayList<Discount> discounts) {
+    public Product(int id, String name, double unitPrice, int stockLevel, double replenishLevel, UnitType type,ArrayList<Discount> discounts) {
 	updateProductInfo(id, name, unitPrice, stockLevel, replenishLevel, type, discounts);
     }
     
@@ -23,12 +23,17 @@ public class Product {
 	 *  use it wisely 
 	 */
 	
+	// TODO: remove dummy data
 	ArrayList<Product> prs = new ArrayList<>();
+	prs.add(new Product(1, "Mango", 2.0, 20, 10, UnitType.kg, new ArrayList<Discount>()));
+	prs.add(new Product(1, "Carrot", 4.5, 10, 10, UnitType.kg, new ArrayList<Discount>()));
+	prs.add(new Product(1, "Water", 1.5, 5, 20, UnitType.pcs, new ArrayList<Discount>()));
+	prs.add(new Product(1, "Pepsi", 3.5, 20, 10, UnitType.pcs, new ArrayList<Discount>()));
 	
 	return prs;
     }
 
-    private void updateProductInfo(int id, String name, double unitPrice, double stockLevel, double replenishLevel, UnitType type,ArrayList<Discount> discounts){
+    private void updateProductInfo(int id, String name, double unitPrice, int stockLevel, double replenishLevel, UnitType type,ArrayList<Discount> discounts){
 	this.id = id;
 	this.name = name;
 	this.unitPrice = unitPrice;
@@ -38,7 +43,9 @@ public class Product {
 	this.discounts = discounts;
     }
     
-
+    public UnitType getType(){
+	return this.type;
+    }
     
     public double getProductPrice(){
 	return this.unitPrice;
@@ -54,7 +61,7 @@ public class Product {
 	return fetchProductsFromServer();
     }
     
-    public double getStockLevel(){
+    public int getStockLevel(){
 	return stockLevel;
     }
     public boolean setStockLevel(double newLevel){
@@ -100,7 +107,7 @@ public class Product {
 	return true;
     }
     
-    public boolean editDiscount(Discount dc,double quantity, double percentage){
+    public boolean editDiscount(Discount dc,int quantity, double percentage){
 	// TODO: edit discount on server
 	
 	dc.setPercentage(percentage);
@@ -119,7 +126,7 @@ public class Product {
 	return discounts;
     }
     
-    public boolean addDiscount(double quantity,double percentage){
+    public boolean addDiscount(int quantity,int percentage){
 	// TODO: add new discount on server
 	
 	// add discount to product locally

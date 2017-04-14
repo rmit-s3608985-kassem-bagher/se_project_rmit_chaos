@@ -24,9 +24,9 @@ public class Customer {
 	// TODO: call customer login API and fill the data from the response
 	this.name = "";
 	this.id = 1;
-	this.balance = 0;
+	this.balance = 40;
 	this.points = 0;
-	this.loggedIn = false;
+	this.loggedIn = true;
 
 	// operation status
 	if (this.loggedIn) {

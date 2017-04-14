@@ -12,7 +12,7 @@ public class PurchaseOrder {
 	this.supplier = supplier;
     }
 
-    public boolean addProduct(Product pr, double qty) {
+    public boolean addProduct(Product pr, int qty) {
 	PurchaseOrderItem item = new PurchaseOrderItem(pr, qty);
 	this.orderItems.add(item);
 	return true;

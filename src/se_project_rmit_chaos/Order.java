@@ -40,7 +40,7 @@ class Order {
 	this.total = this.subtotal - this.pointsDiscount;
     }
 
-    public boolean addProduct(Product pr, double qty) {
+    public boolean addProduct(Product pr, int qty) {
 	if (this.status == OrderStatus.placed) {
 	    System.err.println("Cannot add products to already placed orders");
 	    return false;
@@ -53,7 +53,6 @@ class Order {
 	    System.err.println("only " + pr.getStockLevel() + " products remaining");
 	    return false;
 	}
-
 	OrderItem item = new OrderItem(pr, qty, this);
 	this.orderItems.add(item);
 	return true;

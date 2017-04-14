@@ -3,9 +3,9 @@ package se_project_rmit_chaos;
 public class Discount {
 
     private double percentage;
-    private double quantity;
+    private int quantity;
 
-    public Discount(double percentage, double quantity) {
+    public Discount(double percentage, int quantity) {
 	this.percentage = percentage;
 	this.quantity = quantity;
     }
@@ -22,7 +22,7 @@ public class Discount {
 	return quantity;
     }
 
-    public void setQuantity(double quantity) {
+    public void setQuantity(int quantity) {
 	this.quantity = quantity;
     }
 

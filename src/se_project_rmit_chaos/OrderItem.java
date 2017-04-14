@@ -4,7 +4,7 @@ public class OrderItem extends Item {
     private Order order;
     private double total;
 
-    public OrderItem(Product p, double qty, Order order) {
+    public OrderItem(Product p, int qty, Order order) {
 	super(qty, p);
 	this.order = order;
     }

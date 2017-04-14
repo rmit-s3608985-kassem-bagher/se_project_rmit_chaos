@@ -1,10 +1,10 @@
 package se_project_rmit_chaos;
 
 public class Item {
-    protected double quantity;
+    protected int quantity;
     protected Product product;
     
-    public Item(double quantity, Product product) {
+    public Item(int quantity, Product product) {
 	this.quantity = quantity;
 	this.product = product;
     }

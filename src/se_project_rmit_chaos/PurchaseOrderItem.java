@@ -4,7 +4,7 @@ public class PurchaseOrderItem extends Item {
 
     private double total;
     
-    public PurchaseOrderItem(Product p, double qty) {
+    public PurchaseOrderItem(Product p, int qty) {
 	super(qty, p);
     }
     
