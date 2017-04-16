@@ -34,7 +34,7 @@ public class Supplier {
 	 *  use it wisely 
 	 */
 	
-	ArrayList<Supplier> sups = new ArrayList<>();
+	ArrayList<Supplier> sups = new ArrayList<Supplier>();
 	
 	return sups;
     }

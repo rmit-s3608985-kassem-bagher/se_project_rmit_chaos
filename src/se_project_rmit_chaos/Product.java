@@ -24,7 +24,7 @@ public class Product {
 	 */
 	
 	// TODO: remove dummy data
-	ArrayList<Product> prs = new ArrayList<>();
+	ArrayList<Product> prs = new ArrayList<Product>();
 	prs.add(new Product(1, "Mango", 2.0, 20, 10, UnitType.kg, new ArrayList<Discount>()));
 	prs.add(new Product(1, "Carrot", 4.5, 10, 10, UnitType.kg, new ArrayList<Discount>()));
 	prs.add(new Product(1, "Water", 1.5, 5, 20, UnitType.pcs, new ArrayList<Discount>()));
