@@ -40,14 +40,7 @@ public class Employee {
 	}
 	this.id = json.getInt("id");
 	this.name = json.getString("name");
-
-	if (json.getString("role").equals(EmployeeRole.manager.toString()))
-	    this.role = EmployeeRole.manager;
-	else if (json.getString("role").equals(EmployeeRole.sales.toString()))
-	    this.role = EmployeeRole.sales;
-	else if (json.getString("role").equals(EmployeeRole.warehouse.toString()))
-	    this.role = EmployeeRole.warehouse;
-
+	this.role = EmployeeRole.valueOf(json.getString("role"));
 	this.loggedIn = true;
 
 	if (this.loggedIn) {

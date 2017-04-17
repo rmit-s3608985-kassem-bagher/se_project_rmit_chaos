@@ -2,6 +2,8 @@ package se_project_rmit_chaos;
 
 import java.util.ArrayList;
 
+import javax.swing.plaf.synth.SynthSeparatorUI;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -66,8 +68,16 @@ public class Supplier {
 	ArrayList<Supplier> sups = new ArrayList<Supplier>();
 	for (int i = 0; i < jsonArray.length(); i++) {
 	    JSONObject json = jsonArray.getJSONObject(i);
+	    ArrayList<Product> products = new ArrayList<Product>();
+	    JSONArray jsonProducts = json.getJSONArray("products");
+	    for (int j = 0; j < jsonProducts.length(); j++) {
+		JSONObject product = jsonProducts.getJSONObject(j);		
+		 products.add(new Product(product.getInt("id"),product.getString("name"), product.getDouble("unit_price"), product.getInt("stock_level"),
+		 product.getInt("replenish_level"), UnitType.valueOf(product.getString("type")), null));
+	    }
+
 	    Supplier sup = new Supplier(json.getInt("id"), json.getString("name"), json.getString("address"),
-		    json.getInt("postcode"), json.getString("phone"), null);
+		    json.getInt("postcode"), json.getString("phone"),products);
 	    sups.add(sup);
 	}
 
@@ -125,32 +135,17 @@ public class Supplier {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getAddress() {
         return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
     }
 
     public int getPostcode() {
         return postcode;
     }
 
-    public void setPostcode(int postcode) {
-        this.postcode = postcode;
-    }
-
     public String getPhone() {
         return phone;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
 
 }
