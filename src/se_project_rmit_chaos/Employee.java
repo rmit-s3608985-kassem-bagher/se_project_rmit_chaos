@@ -1,5 +1,12 @@
 package se_project_rmit_chaos;
 
+import org.json.JSONObject;
+
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
+
 public class Employee {
     private String name = "";
     private int id = 0;
@@ -9,12 +16,6 @@ public class Employee {
     boolean loggedIn = false;
 
     Employee(String username, String password) {
-	this.name = "";
-	this.role = null;
-	this.username = username;
-	this.password = password;
-	this.loggedIn = false;
-	this.id = 0;
 	if (login(username, password)) {
 	    System.out.println("Employee Created and logged in");
 	} else {
@@ -23,28 +24,32 @@ public class Employee {
     }
 
     public boolean login(String username, String password) {
-	// TODO: call employee login API and fill the data from the response
-	this.name = "";
-	this.loggedIn = true;
-	this.id = 1;
-	int role = 1;
-
-	// determine employee's role
-	switch (role) {
-	case 1: // manager
-	    this.role = EmployeeRole.manager;
-	    break;
-	case 2: // sales
-	    this.role = EmployeeRole.sales;
-	    break;
-	case 3: // warehouse
-	    this.role = EmployeeRole.warehouse;
-	    break;
-	default:
-	    break;
+	HttpResponse<JsonNode> request = null;
+	try {
+	    request = Unirest.get("http://localhost/supermarket/api.php/employee/login?username=" + username
+		    + "&password=" + password).header("accept", "application/json").asJson();
+	} catch (UnirestException e) {
+	    e.printStackTrace();
+	    return false;
 	}
+	// retrieve the parsed JSONObject from the response
+	JSONObject json = request.getBody().getObject();
+	if (json.has("error")) {
+	    System.err.println(json.getJSONObject("error").getString("message"));
+	    return false;
+	}
+	this.id = json.getInt("id");
+	this.name = json.getString("name");
 
-	// operation status
+	if (json.getString("role").equals(EmployeeRole.manager.toString()))
+	    this.role = EmployeeRole.manager;
+	else if (json.getString("role").equals(EmployeeRole.sales.toString()))
+	    this.role = EmployeeRole.sales;
+	else if (json.getString("role").equals(EmployeeRole.warehouse.toString()))
+	    this.role = EmployeeRole.warehouse;
+
+	this.loggedIn = true;
+
 	if (this.loggedIn) {
 	    return true;
 	}

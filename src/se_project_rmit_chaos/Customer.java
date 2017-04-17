@@ -28,7 +28,6 @@ public class Customer {
     }
 
     public boolean login(String username, String password) {
-	// TODO: call customer login API and fill the data from the response
 	HttpResponse<JsonNode> request = null;
 	try {
 	    request = Unirest.get(
@@ -74,7 +73,6 @@ public class Customer {
     }
 
     public boolean deductBalance(double amount) {
-	// TODO: call the deduct balance API
 	this.balance -= amount;
 	return true;
     }
@@ -84,7 +82,6 @@ public class Customer {
     }
 
     public double getPointsDiscount(double orderSubtotal) {
-
 	double discountAmount = Math.floor(this.points / 20.0) * 5.0;
 	return discountAmount;
     }
@@ -101,7 +98,6 @@ public class Customer {
     }
 
     public boolean addPoints(int points) {
-	// TODO: call the add points API
 	this.points += points;
 	return true;
     }

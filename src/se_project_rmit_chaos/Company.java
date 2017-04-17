@@ -77,8 +77,9 @@ public class Company
    {
        
 	ArrayList<Product> prs = Product.fetchProductsFromServer();
-	Customer cu = new Customer("kassem", "kassem123");
-	System.out.println(cu.getName());
+	Employee emp = new Employee("tim", "tim");
+//	Customer cu = new Customer("kassem", "kassem123");
+//	System.out.println(cu.getName());
 	
    }
 //
