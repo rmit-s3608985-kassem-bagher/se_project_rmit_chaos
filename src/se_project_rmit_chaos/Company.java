@@ -1,6 +1,12 @@
 package se_project_rmit_chaos;
 
 import java.util.*;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
@@ -68,7 +74,38 @@ public class Company
 //   }
 //
    public static void main(String args[])
-   {   
+   {
+       
+       int first = 1;
+       int second = 1;
+       int third = 0;
+       for (int i=3; i<= 7; i++)
+       {
+           third=first+second;
+           first = second;
+           second = third;
+       }
+       System.out.print(" " + third);
+       
+    // the request from your question
+       HttpResponse<JsonNode> request=null;;
+    try {
+	request = Unirest.get("http://downcloudapp.com/api/v2/api.php/downloader.json?soundID=317048397&key=qvydTp2TJTGD8cnuMxoTKRAwep")
+	       .header("accept", "application/json")
+	       .asJson();
+    } catch (UnirestException e) {
+	// TODO Auto-generated catch block
+	e.printStackTrace();
+    }
+       // retrieve the parsed JSONObject from the response
+       JSONObject myObj = request.getBody().getObject();
+
+       // extract fields from the object
+       System.out.println(myObj.getString("download_url"));
+//       String msg = myObj.getString("download_url");
+//       JSONArray results = myObj.getJSONArray();
+       
+       
 	ArrayList<Product> prs = Product.fetchProductsFromServer();
 	Customer cu = new Customer("Kassem", "aaa");
 	Order or = new Order(cu);
