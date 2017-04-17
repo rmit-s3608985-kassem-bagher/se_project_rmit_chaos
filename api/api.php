@@ -2,7 +2,7 @@
 
 require_once '../restler.php';
 
-$r = new Restler();
+$r = new Restler(true);
 $r->setSupportedFormats('JsonFormat');
-$r->addAPIClass('employee');
+$r->addAPIClass('customer');
 $r->handle();
