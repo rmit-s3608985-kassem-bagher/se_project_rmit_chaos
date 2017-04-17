@@ -7,4 +7,5 @@ $r = new Restler();
 $r->setSupportedFormats('JsonFormat');
 $r->addAPIClass('employee');
 $r->addAPIClass('customer');
+$r->addAPIClass('supplier');
 $r->handle();
