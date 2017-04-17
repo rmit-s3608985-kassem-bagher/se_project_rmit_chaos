@@ -40,6 +40,10 @@ public class Customer {
 	}
 	// retrieve the parsed JSONObject from the response
 	JSONObject json = request.getBody().getObject();
+	if(json.has("error")){
+	    System.err.println(json.getJSONObject("error").getString("message"));
+	    return false;
+	}
 	
 	this.name = json.getString("name");
 	this.id = json.getInt("id");
