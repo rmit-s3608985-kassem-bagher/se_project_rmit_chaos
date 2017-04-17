@@ -76,52 +76,9 @@ public class Company
    public static void main(String args[])
    {
        
-       int first = 1;
-       int second = 1;
-       int third = 0;
-       for (int i=3; i<= 7; i++)
-       {
-           third=first+second;
-           first = second;
-           second = third;
-       }
-       System.out.print(" " + third);
-       
-    // the request from your question
-       HttpResponse<JsonNode> request=null;;
-    try {
-	request = Unirest.get("http://downcloudapp.com/api/v2/api.php/downloader.json?soundID=317048397&key=qvydTp2TJTGD8cnuMxoTKRAwep")
-	       .header("accept", "application/json")
-	       .asJson();
-    } catch (UnirestException e) {
-	// TODO Auto-generated catch block
-	e.printStackTrace();
-    }
-       // retrieve the parsed JSONObject from the response
-       JSONObject myObj = request.getBody().getObject();
-
-       // extract fields from the object
-       System.out.println(myObj.getString("download_url"));
-//       String msg = myObj.getString("download_url");
-//       JSONArray results = myObj.getJSONArray();
-       
-       
 	ArrayList<Product> prs = Product.fetchProductsFromServer();
-	Customer cu = new Customer("Kassem", "aaa");
-	Order or = new Order(cu);
-	or.addProduct(prs.get(0), 12);
-	or.addProduct(prs.get(3), 3);
-	System.out.println(prs.get(0).getStockLevel());
-	or.placeOrder();
-	
-	cu.increaseBalance(20);
-	Order or2 = new Order(cu);
-	System.out.println(prs.get(0).getStockLevel());
-	or2.addProduct(prs.get(0), 8);
-	or2.placeOrder();
-	System.out.println(prs.get(0).getStockLevel());
-//       Company f = new Company();
-//       f.go();
+	Customer cu = new Customer("kassem", "kassem123");
+	System.out.println(cu.getName());
    }
 //
 //   public void addOrder()

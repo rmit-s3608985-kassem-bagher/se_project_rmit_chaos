@@ -1,5 +1,12 @@
 package se_project_rmit_chaos;
 
+import org.json.JSONObject;
+
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
+
 public class Customer {
     private String name;
     private int id;
@@ -22,13 +29,24 @@ public class Customer {
 
     public boolean login(String username, String password) {
 	// TODO: call customer login API and fill the data from the response
-	this.name = "";
-	this.id = 1;
-	this.balance = 40;
-	this.points = 0;
+	HttpResponse<JsonNode> request = null;
+	try {
+	    request = Unirest.get(
+	    	"http://localhost/supermarket/api.php/customer/login?username=" + username + "&password=" + password)
+	    	.header("accept", "application/json").asJson();
+	} catch (UnirestException e) {
+	    e.printStackTrace();
+	    return false;
+	}
+	// retrieve the parsed JSONObject from the response
+	JSONObject json = request.getBody().getObject();
+	
+	this.name = json.getString("name");
+	this.id = json.getInt("id");
+	this.balance = json.getDouble("balance");
+	this.points = json.getInt("points");
 	this.loggedIn = true;
 
-	// operation status
 	if (this.loggedIn) {
 	    return true;
 	}
@@ -46,9 +64,9 @@ public class Customer {
     public double getBalance() {
 	return balance;
     }
-    
-    public void increaseBalance(double amount){
-	this.balance+= amount;
+
+    public void increaseBalance(double amount) {
+	this.balance += amount;
     }
 
     public boolean deductBalance(double amount) {
@@ -83,12 +101,11 @@ public class Customer {
 	this.points += points;
 	return true;
     }
-    
+
     public boolean addPoints(double subtotal) {
 	int points = (int) (Math.floor(this.points / 20.0)) * 20;
 	this.points += points;
 	return true;
     }
-    
 
 }
