@@ -129,4 +129,3 @@ FOREIGN KEY (supplier) REFERENCES supermarket.supplier (sup_id);
 ALTER TABLE purchase_order
   ADD CONSTRAINT purchase_order_supplier_id_fk
 FOREIGN KEY (supplier) REFERENCES supermarket.supplier (sup_id);
-

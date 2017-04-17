@@ -32,13 +32,13 @@ public class Employee {
 	// determine employee's role
 	switch (role) {
 	case 1: // manager
-	    this.role = EmployeeRole.Manager;
+	    this.role = EmployeeRole.manager;
 	    break;
 	case 2: // sales
-	    this.role = EmployeeRole.Sales;
+	    this.role = EmployeeRole.sales;
 	    break;
 	case 3: // warehouse
-	    this.role = EmployeeRole.Warehouse;
+	    this.role = EmployeeRole.warehouse;
 	    break;
 	default:
 	    break;
