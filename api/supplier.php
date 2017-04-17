@@ -18,7 +18,7 @@ class supplier
         $con = mysqli_connect('localhost', 'root', '', 'supermarket');
         $con->set_charset("utf8");
         $result = mysqli_query($con, "select * from product where supplier = $suppiler_id");
-        $products = null;
+        $products = array();
         while($row = mysqli_fetch_array($result))
         {
             $prod = array(
@@ -42,7 +42,7 @@ class supplier
         $con = mysqli_connect('localhost', 'root', '', 'supermarket');
         $con->set_charset("utf8");
         $result = mysqli_query($con, "select * from supplier");
-        $suppliers = null;
+        $suppliers = array();
 
         while($row = mysqli_fetch_array($result))
         {

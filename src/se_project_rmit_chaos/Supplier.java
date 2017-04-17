@@ -58,26 +58,41 @@ public class Supplier {
 	// retrieve the parsed JSONObject from the response
 	JSONArray jsonArray = request.getBody().getArray();
 
-	if (jsonArray == null) // no data
+	// no data
+	if (jsonArray == null)
 	    return null;
 
+	// error response
 	if (jsonArray.getJSONObject(0).has("error")) {
 	    System.err.println(jsonArray.getJSONObject(0).getJSONObject("error").getString("message"));
 	    return null;
 	}
+
+	// retrieve suppliers
 	ArrayList<Supplier> sups = new ArrayList<Supplier>();
 	for (int i = 0; i < jsonArray.length(); i++) {
-	    JSONObject json = jsonArray.getJSONObject(i);
+	    JSONObject jsonSup = jsonArray.getJSONObject(i);
+	    // supplier's products
 	    ArrayList<Product> products = new ArrayList<Product>();
-	    JSONArray jsonProducts = json.getJSONArray("products");
+	    JSONArray jsonProducts = jsonSup.getJSONArray("products");
+	    // retrieve supplier's product
 	    for (int j = 0; j < jsonProducts.length(); j++) {
-		JSONObject product = jsonProducts.getJSONObject(j);		
-		 products.add(new Product(product.getInt("id"),product.getString("name"), product.getDouble("unit_price"), product.getInt("stock_level"),
-		 product.getInt("replenish_level"), UnitType.valueOf(product.getString("type")), null));
+		JSONObject product = jsonProducts.getJSONObject(j);
+		// product's discounts
+		ArrayList<Discount> discounts = new ArrayList<Discount>();
+		JSONArray jsonDiscounts = product.getJSONArray("discounts");
+		// retrieve product's discounts
+		for (int k = 0; k < jsonDiscounts.length(); k++) {
+		    JSONObject disc = jsonDiscounts.getJSONObject(k);
+		    discounts.add(new Discount(disc.getInt("percentage"), disc.getInt("quantity")));
+		}
+		products.add(new Product(product.getInt("id"), product.getString("name"),
+			product.getDouble("unit_price"), product.getInt("stock_level"),
+			product.getInt("replenish_level"), UnitType.valueOf(product.getString("type")), discounts));
 	    }
 
-	    Supplier sup = new Supplier(json.getInt("id"), json.getString("name"), json.getString("address"),
-		    json.getInt("postcode"), json.getString("phone"),products);
+	    Supplier sup = new Supplier(jsonSup.getInt("id"), jsonSup.getString("name"), jsonSup.getString("address"),
+		    jsonSup.getInt("postcode"), jsonSup.getString("phone"), products);
 	    sups.add(sup);
 	}
 
@@ -122,30 +137,29 @@ public class Supplier {
     public ArrayList<Product> getSupplierProducts() {
 	return this.products;
     }
-    
+
     public int getId() {
-        return id;
+	return id;
     }
 
     public void setId(int id) {
-        this.id = id;
+	this.id = id;
     }
 
     public String getName() {
-        return name;
+	return name;
     }
 
     public String getAddress() {
-        return address;
+	return address;
     }
 
     public int getPostcode() {
-        return postcode;
+	return postcode;
     }
 
     public String getPhone() {
-        return phone;
+	return phone;
     }
-
 
 }

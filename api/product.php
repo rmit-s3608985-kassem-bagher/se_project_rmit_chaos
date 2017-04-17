@@ -18,7 +18,7 @@ class product
         $con = mysqli_connect('localhost', 'root', '', 'supermarket');
         $con->set_charset("utf8");
         $result = mysqli_query($con, "select * from discount where product=$product_id");
-        $discounts = null;
+        $discounts = array();
         while($row = mysqli_fetch_array($result))
         {
             $disc = array(
