@@ -1,7 +1,6 @@
 # Supermarket Support System
 ### RMIT Chaos Team
 ____
-###### **Project Structure:**
 - **Architecture**
 	- Server side
 		- PHP
