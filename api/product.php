@@ -27,6 +27,34 @@ class product
         return true;
     }
 
+
+    private function getProduct($product_id)
+    {
+        $con = mysqli_connect('localhost', 'root', '', 'supermarket');
+        $con->set_charset("utf8");
+        $result = mysqli_query($con, "select * from product where prod_id= $product_id");
+        $row = $result->fetch_assoc();
+
+        if ($row == null) {
+            $res = new stdClass();
+            $res->product = null;
+            return $res;
+        }
+
+        $product = new stdClass();
+        $product->id = $row['prod_id'];
+        $product->name= $row['prod_name'];
+        $product->unit_price= $row['prod_unit_price'];
+        $product->stock_level= $row['prod_stock_level'];
+        $product->replenish_level= $row['prod_replenish_level'];
+        $product->type= $row['prod_type'];
+        $product->discounts= $this->getProductDiscounts($row['prod_id']);
+
+        $res = new stdClass();
+        $res->product = $product;
+        return $res;
+    }
+
     private function getDiscount($product_id, $percentage, $quantity)
     {
         $con = mysqli_connect('localhost', 'root', '', 'supermarket');
@@ -102,6 +130,23 @@ class product
         return $res;
     }
 
+
+    /**
+     * @url POST /{product_id}/update_price
+     * @param $product_id
+     * @param $price
+     * @return stdClass
+     */
+    public function editPrice($product_id,$price)
+    {
+        $con = mysqli_connect('localhost', 'root', '', 'supermarket');
+        $con->set_charset("utf8");
+        $result = mysqli_query($con, "update product set prod_unit_price = $price where prod_id=$product_id ");
+        if (!$result)
+            throw new RestException(400, "could not update product price");
+
+        return $this->getProduct($product_id);
+    }
 
     /**
      * @url POST /{product_id}/update_discount

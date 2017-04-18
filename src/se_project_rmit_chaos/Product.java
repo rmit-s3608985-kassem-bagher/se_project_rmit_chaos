@@ -66,8 +66,32 @@ public class Product {
     }
     
     public boolean editUnitPrice(double newPrice) {
-	// TODO: call edit product price API
-	this.unitPrice = newPrice;
+	HttpResponse<JsonNode> request = null;
+	try {
+	    request = Unirest
+		    .post("http://localhost/supermarket/api.php/product/{id}/update_price")
+		    .header("accept", "application/json")
+		    .header("Content-Type", "application/json")
+		    .routeParam("id",Integer.toString(this.id))
+		    .queryString("key", "519428fdced64894bb10cd90bd87167c")
+		    .queryString("price", newPrice)
+		    .asJson();
+	} catch (UnirestException e) {
+	    e.printStackTrace();
+	    return false;
+	}
+	// retrieve the parsed JSONObject from the response
+	JSONObject json = request.getBody().getObject();
+	if (json.has("error")) {
+	    System.err.println(json.getJSONObject("error").getString("message"));
+	    return false;
+	}
+	if(json.getJSONObject("product")==null){
+	    System.err.println("could not edit product's price");
+	    return false;
+	}
+	json = json.getJSONObject("product");
+	this.unitPrice = json.getDouble("unit_price");
 	return true;
     }
 
