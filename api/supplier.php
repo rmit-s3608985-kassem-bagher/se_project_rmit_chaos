@@ -5,6 +5,7 @@
  * User: kassem
  * Date: 17/4/17
  * Time: 7:31 PM
+ * @access protected
  */
 class supplier
 {

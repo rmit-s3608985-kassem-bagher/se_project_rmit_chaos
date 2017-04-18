@@ -5,6 +5,7 @@
  * User: kassem
  * Date: 17/4/17
  * Time: 7:30 PM
+ * @access protected
  */
 class customer
 {

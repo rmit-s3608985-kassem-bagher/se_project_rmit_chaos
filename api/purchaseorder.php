@@ -5,6 +5,8 @@
  * User: kassem
  * Date: 17/4/17
  * Time: 7:33 PM
+ *
+ * @access protected
  */
 class purchaseorder
 {
@@ -13,9 +15,11 @@ class purchaseorder
     {
         $query = "insert into purchase_order_item (purchase_order, product, item_quantity,item_total) values($purchase_order_id,$product_id,$quantity,$total) ";
         $result = mysqli_query($con, $query);
-        if ($result)
-            return true;
-        return false;
+        if (!$result)
+            return false;
+        if(!product::increaseStockLevel($con,$product_id,$quantity))
+            return false;
+        return true;
     }
 
     private function addPurchaseOrderRecord($con, $date, $employee_id, $supplier_id)
@@ -56,6 +60,10 @@ class purchaseorder
         }
         mysqli_commit($con);
         mysqli_close($con);
-        throw new RestException(200, 'Purchase order created');
+
+        $responce = new stdClass();
+        $responce->code = "200";
+        $responce->message = "Prchase order placed";
+        return $responce;
     }
 }
