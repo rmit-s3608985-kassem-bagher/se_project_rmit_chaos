@@ -122,7 +122,6 @@ public class Product {
     }
     
     public boolean editDiscount(Discount dc,int quantity, double percentage){
-	// TODO: edit discount on server
 	HttpResponse<JsonNode> request = null;
 	try {
 	    request = Unirest
@@ -157,8 +156,31 @@ public class Product {
     }
     
     public boolean deleteDiscount(Discount dc){
-	// TODO: delete discount on server
-	
+	HttpResponse<JsonNode> request = null;
+	try {
+	    request = Unirest
+		    .post("http://localhost/supermarket/api.php/product/{id}/delete_discount")
+		    .header("accept", "application/json")
+		    .header("Content-Type", "application/json")
+		    .routeParam("id",Integer.toString(this.id))
+		    .queryString("key", "519428fdced64894bb10cd90bd87167c")
+		    .queryString("percentage", dc.getPercentage())
+		    .queryString("quantity", dc.getQuantity())
+		    .asJson();
+	} catch (UnirestException e) {
+	    e.printStackTrace();
+	    return false;
+	}
+	// retrieve the parsed JSONObject from the response
+	JSONObject json = request.getBody().getObject();
+	if (json.has("error")) {
+	    System.err.println(json.getJSONObject("error").getString("message"));
+	    return false;
+	}
+	if(json.getJSONObject("responce")==null){
+	    System.err.println("could not delete discount");
+	    return false;
+	}
 	discounts.remove(discounts);
 	return true;
     }
@@ -168,8 +190,32 @@ public class Product {
     }
     
     public boolean addDiscount(int quantity,int percentage){
-	// TODO: add new discount on server
-	
+	HttpResponse<JsonNode> request = null;
+	try {
+	    request = Unirest
+		    .post("http://localhost/supermarket/api.php/product/{id}/add_discount")
+		    .header("accept", "application/json")
+		    .header("Content-Type", "application/json")
+		    .routeParam("id",Integer.toString(this.id))
+		    .queryString("key", "519428fdced64894bb10cd90bd87167c")
+		    .queryString("percentage", percentage)
+		    .queryString("quantity", quantity)
+		    .asJson();
+	} catch (UnirestException e) {
+	    e.printStackTrace();
+	    return false;
+	}
+	// retrieve the parsed JSONObject from the response
+	JSONObject json = request.getBody().getObject();
+	if (json.has("error")) {
+	    System.err.println(json.getJSONObject("error").getString("message"));
+	    return false;
+	}
+	if(json.getJSONObject("responce")==null){
+	    System.err.println("could not add discount");
+	    return false;
+	}
+
 	// add discount to product locally
 	Discount dc = new Discount(percentage, quantity);
 	discounts.add(dc);

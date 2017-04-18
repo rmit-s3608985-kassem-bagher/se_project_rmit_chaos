@@ -49,6 +49,61 @@ class product
     }
 
     /**
+     * @url POST /{product_id}/delete_discount
+     * @param $product_id
+     * @param $percentage
+     * @param $quantity
+     * @return stdClass
+     */
+    public function deleteDiscount($product_id, $percentage, $quantity)
+    {
+        $con = mysqli_connect('localhost', 'root', '', 'supermarket');
+        $con->set_charset("utf8");
+        $result = mysqli_query($con, "delete from discount where disc_quantity=$quantity and disc_percentage=$percentage and product=$product_id");
+        if (!$result)
+            throw new RestException(400, "could not delete discount");
+
+        $disc = $this->getDiscount($product_id, $percentage, $quantity);
+        if ($disc->discount!=null)
+            throw new RestException(400, "could not delete discount.");
+
+        $responce = new stdClass();
+        $responce->code = "200";
+        $responce->message = "discount deleted";
+        $res = new stdClass();
+        $res->responce = $responce;
+        return $res;
+    }
+
+    /**
+     * @url POST /{product_id}/add_discount
+     * @param $product_id
+     * @param $percentage
+     * @param $quantity
+     * @return stdClass
+     */
+    public function addDiscount($product_id, $percentage, $quantity)
+    {
+        $con = mysqli_connect('localhost', 'root', '', 'supermarket');
+        $con->set_charset("utf8");
+        $result = mysqli_query($con, "insert into discount (disc_quantity, product, disc_percentage) values($quantity,$product_id,$percentage) ");
+        if (!$result)
+            throw new RestException(400, "could not add discount");
+
+        $disc = $this->getDiscount($product_id, $percentage, $quantity);
+        if ($disc->discount==null)
+            throw new RestException(400, "could not add discount.");
+
+        $responce = new stdClass();
+        $responce->code = "200";
+        $responce->message = "discount added";
+        $res = new stdClass();
+        $res->responce = $responce;
+        return $res;
+    }
+
+
+    /**
      * @url POST /{product_id}/update_discount
      * @param $product_id
      * @param $old_percentage
