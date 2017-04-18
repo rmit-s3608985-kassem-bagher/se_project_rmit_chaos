@@ -1,12 +1,7 @@
 package se_project_rmit_chaos;
 
 import java.util.ArrayList;
-
-import javax.swing.plaf.synth.SynthSeparatorUI;
-
 import org.json.JSONArray;
-import org.json.JSONObject;
-
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -41,12 +36,6 @@ public class Supplier {
      */
 
     public static ArrayList<Supplier> fetchSuppliersFromServer() {
-	// TODO: fetch from server, loop and store in array
-	/*
-	 * the caller should keep track of the suppliers calling this method may
-	 * cause referencing problem use it wisely
-	 */
-
 	HttpResponse<JsonNode> request = null;
 	try {
 	    request = Unirest.get("http://localhost/supermarket/api.php/supplier").header("accept", "application/json")
@@ -79,7 +68,7 @@ public class Supplier {
      * 
      * Only variables with data will be changed in the system.<br>
      * For string data, pass "" to keep as is<br>
-     * For numbers, pass -1 to keep as is
+     * For numbers, pass 0 to keep as is
      *
      * @param name
      *            the name of the
@@ -89,12 +78,43 @@ public class Supplier {
      * @return
      */
     public boolean editSupplier(String name, String address, int postcode, String phone) {
-	// TODO: call the edit supplier API, on success complete the code
+	
+	name = name.isEmpty() ? this.name : name;
+	address = address.isEmpty() ? this.address : address;
+	postcode = postcode ==0 ? this.postcode : postcode;
+	phone = phone.isEmpty() ? this.phone : phone;
 
-	this.name = name.isEmpty() ? this.name : name;
-	this.address = address.isEmpty() ? this.address : address;
-	this.postcode = postcode < 0 ? this.postcode : postcode;
-	this.phone = phone.isEmpty() ? this.phone : phone;
+	
+	HttpResponse<JsonNode> request = null;
+	try {
+	    request = Unirest.get("http://localhost/supermarket/api.php/supplier/{id}/update").header("accept", "application/json")
+		    .routeParam("id", Integer.toString(this.id))
+		    .queryString("name", name)
+		    .queryString("address", address)
+		    .queryString("postcode", postcode)
+		    .queryString("phone", phone)
+		    .asJson();
+	} catch (UnirestException e) {
+	    e.printStackTrace();
+	    return false;
+	}
+	// retrieve the parsed JSONObject from the response
+	JSONArray jsonArray = request.getBody().getArray();
+
+	// no data
+	if (jsonArray == null)
+	    return false;
+
+	// error response
+	if (jsonArray.getJSONObject(0).has("error")) {
+	    System.err.println(jsonArray.getJSONObject(0).getJSONObject("error").getString("message"));
+	    return false;
+	}
+	Supplier sup = JsonParser.parseSupplier(jsonArray.getJSONObject(0));
+	this.name = sup.getName();
+	this.address = sup.getAddress();
+	this.postcode = sup.getPostcode();
+	this.phone = sup.getPhone();
 	return true;
     }
 
@@ -113,10 +133,6 @@ public class Supplier {
 
     public int getId() {
 	return id;
-    }
-
-    public void setId(int id) {
-	this.id = id;
     }
 
     public String getName() {

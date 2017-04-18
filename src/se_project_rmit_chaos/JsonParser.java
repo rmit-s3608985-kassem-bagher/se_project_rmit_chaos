@@ -38,13 +38,14 @@ public class JsonParser {
 	ArrayList<Supplier> suppliers = new ArrayList<Supplier>();
 	for (int i = 0; i < jsonSuppliers.length(); i++) {
 	    JSONObject jsonSup = jsonSuppliers.getJSONObject(i);
-	    // supplier's products
-	    ArrayList<Product> products = parseProducts(jsonSup.getJSONArray("products"));
-
-	    Supplier sup = new Supplier(jsonSup.getInt("id"), jsonSup.getString("name"), jsonSup.getString("address"),
-		    jsonSup.getInt("postcode"), jsonSup.getString("phone"), products);
-	    suppliers.add(sup);
+	    suppliers.add(parseSupplier(jsonSup));
 	}
 	return suppliers;
+    }
+    
+    public static Supplier parseSupplier(JSONObject jsonSupplier){
+	return new Supplier(jsonSupplier.getInt("id"), jsonSupplier.getString("name"), jsonSupplier.getString("address"),
+		    jsonSupplier.getInt("postcode"), jsonSupplier.getString("phone"), parseProducts(jsonSupplier.getJSONArray("products")));
+
     }
 }
