@@ -26,6 +26,7 @@ class product
                 'percentage' => $row['disc_percentage']);
             $discounts[] = $disc;
         }
+        mysqli_close($con);
         return $discounts;
     }
 }

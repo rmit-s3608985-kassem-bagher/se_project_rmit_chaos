@@ -14,6 +14,7 @@ class supplier
         $con->set_charset("utf8");
         $result = mysqli_query($con, "select sup_id from supplier where sup_id = $supplier_id");
         $row = $result->fetch_assoc();
+        mysqli_close($con);
         if ($row == null)
             return false;
         return true;
@@ -32,6 +33,7 @@ class supplier
         $con = mysqli_connect('localhost', 'root', '', 'supermarket');
         $con->set_charset("utf8");
         $result = mysqli_query($con, "update supplier set sup_name = '$name',sup_address='$address',sup_postcode=$postcode,sup_phone='$phone' where sup_id = $supplier_id");
+        mysqli_close($con);
         return $this->getSuplier($supplier_id);
     }
 
@@ -58,6 +60,7 @@ class supplier
                 'discounts' => product::getProductDiscounts($row['prod_id']));
             $products[] = $prod;
         }
+        mysqli_close($con);
         return $products;
     }
 
@@ -88,6 +91,8 @@ class supplier
         $result = mysqli_query($con, "select * from supplier where sup_id = $supplier_id");
         $row = $result->fetch_assoc();
 
+        mysqli_close($con);
+
         if ($row == null)
             throw new RestException(404, 'supplier not found');
 
@@ -108,6 +113,7 @@ class supplier
         while ($row = mysqli_fetch_array($result)) {
             $suppliers[] = $this->encodeSupplierIntoJson($row);
         }
+        mysqli_close($con);
         return $suppliers;
 
     }

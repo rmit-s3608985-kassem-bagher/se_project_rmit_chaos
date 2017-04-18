@@ -9,4 +9,5 @@ $r->addAPIClass('employee');
 $r->addAPIClass('customer');
 $r->addAPIClass('supplier');
 $r->addAPIClass('product');
+$r->addAPIClass('purchaseorder');
 $r->handle();

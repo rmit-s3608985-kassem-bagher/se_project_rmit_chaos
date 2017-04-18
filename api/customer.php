@@ -14,6 +14,7 @@ class customer
         $con->set_charset("utf8");
         $result = mysqli_query($con, "select * from customer where cust_username ='$username' and cust_password='$password'");
         $row = $result->fetch_assoc();
+        mysqli_close($con);
         if ($row == null)
             throw new RestException(401, 'username and password not found');
 
