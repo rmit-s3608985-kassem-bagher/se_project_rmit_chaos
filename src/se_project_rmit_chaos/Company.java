@@ -76,10 +76,16 @@ public class Company
    public static void main(String args[])
    {
        ArrayList<Supplier> sup = Supplier.fetchSuppliersFromServer();
-       System.out.println(sup.get(0).getSupplierProducts().get(1).getDiscounts().get(1).getPercentage());
-       sup.get(0).editSupplier("Alde", "", 0, "");
-       System.out.println(sup.get(0).getName());
-       
+//       System.out.println(sup.get(0).getSupplierProducts().get(1).getDiscounts().get(1).getPercentage());
+//       sup.get(0).editSupplier("Alde", "", 0, "");
+//       System.out.println(sup.get(0).getName());
+  
+	Employee emp = new Employee("tim", "tim");
+
+       PurchaseOrder pr = new PurchaseOrder(sup.get(0),emp);
+       pr.addProduct(sup.get(0).getSupplierProducts().get(0), 20);
+       pr.addProduct(sup.get(1).getSupplierProducts().get(0), 2);
+       pr.placeOrder();
 //	ArrayList<Product> prs = Product.fetchProductsFromServer();
 //	Employee emp = new Employee("tim", "tim");
 //	System.out.println(emp.getRole());

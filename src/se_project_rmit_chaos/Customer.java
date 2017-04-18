@@ -30,20 +30,22 @@ public class Customer {
     public boolean login(String username, String password) {
 	HttpResponse<JsonNode> request = null;
 	try {
-	    request = Unirest.get(
-	    	"http://localhost/supermarket/api.php/customer/login?username=" + username + "&password=" + password)
-	    	.header("accept", "application/json").asJson();
+	    request = Unirest
+		    .get("http://localhost/supermarket/api.php/customer/login?username=" + username + "&password="
+			    + password)
+		    .queryString("key", "519428fdced64894bb10cd90bd87167c").header("accept", "application/json")
+		    .asJson();
 	} catch (UnirestException e) {
 	    e.printStackTrace();
 	    return false;
 	}
 	// retrieve the parsed JSONObject from the response
 	JSONObject json = request.getBody().getObject();
-	if(json.has("error")){
+	if (json.has("error")) {
 	    System.err.println(json.getJSONObject("error").getString("message"));
 	    return false;
 	}
-	
+
 	this.name = json.getString("name");
 	this.id = json.getInt("id");
 	this.balance = json.getDouble("balance");

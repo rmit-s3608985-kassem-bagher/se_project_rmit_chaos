@@ -6,6 +6,7 @@ public class PurchaseOrderItem extends Item {
     
     public PurchaseOrderItem(Product p, int qty) {
 	super(qty, p);
+	getPrice();
     }
     
     @Override

@@ -26,8 +26,11 @@ public class Employee {
     public boolean login(String username, String password) {
 	HttpResponse<JsonNode> request = null;
 	try {
-	    request = Unirest.get("http://localhost/supermarket/api.php/employee/login?username=" + username
-		    + "&password=" + password).header("accept", "application/json").asJson();
+	    request = Unirest
+		    .get("http://localhost/supermarket/api.php/employee/login?username=" + username + "&password="
+			    + password)
+		    .header("accept", "application/json").queryString("key", "519428fdced64894bb10cd90bd87167c")
+		    .asJson();
 	} catch (UnirestException e) {
 	    e.printStackTrace();
 	    return false;

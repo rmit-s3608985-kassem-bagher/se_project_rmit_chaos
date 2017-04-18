@@ -39,7 +39,7 @@ public class Supplier {
 	HttpResponse<JsonNode> request = null;
 	try {
 	    request = Unirest.get("http://localhost/supermarket/api.php/supplier").header("accept", "application/json")
-		    .asJson();
+		    .queryString("key", "519428fdced64894bb10cd90bd87167c").asJson();
 	} catch (UnirestException e) {
 	    e.printStackTrace();
 	    return null;
@@ -56,7 +56,7 @@ public class Supplier {
 	    System.err.println(jsonArray.getJSONObject(0).getJSONObject("error").getString("message"));
 	    return null;
 	}
-	
+
 	// retrieve suppliers
 	return JsonParser.parseSuppliers(jsonArray);
     }
@@ -78,22 +78,18 @@ public class Supplier {
      * @return
      */
     public boolean editSupplier(String name, String address, int postcode, String phone) {
-	
+
 	name = name.isEmpty() ? this.name : name;
 	address = address.isEmpty() ? this.address : address;
-	postcode = postcode ==0 ? this.postcode : postcode;
+	postcode = postcode == 0 ? this.postcode : postcode;
 	phone = phone.isEmpty() ? this.phone : phone;
 
-	
 	HttpResponse<JsonNode> request = null;
 	try {
-	    request = Unirest.get("http://localhost/supermarket/api.php/supplier/{id}/update").header("accept", "application/json")
-		    .routeParam("id", Integer.toString(this.id))
-		    .queryString("name", name)
-		    .queryString("address", address)
-		    .queryString("postcode", postcode)
-		    .queryString("phone", phone)
-		    .asJson();
+	    request = Unirest.get("http://localhost/supermarket/api.php/supplier/{id}/update")
+		    .header("accept", "application/json").routeParam("id", Integer.toString(this.id))
+		    .queryString("name", name).queryString("address", address).queryString("postcode", postcode)
+		    .queryString("phone", phone).queryString("key", "519428fdced64894bb10cd90bd87167c").asJson();
 	} catch (UnirestException e) {
 	    e.printStackTrace();
 	    return false;
