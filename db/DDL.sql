@@ -1,7 +1,7 @@
 CREATE TABLE supermarket.customer
 (
-  cust_id       INT                 NOT NULL AUTO_INCREMENT
-    PRIMARY KEY,
+  cust_id       INT                 NOT NULL auto_increment
+  PRIMARY KEY,
   cust_name     VARCHAR(200)        NULL,
   cust_balance  DECIMAL DEFAULT '0' NULL,
   cust_points   INT DEFAULT '0'     NULL,
@@ -13,8 +13,8 @@ CREATE TABLE supermarket.customer
 
 CREATE TABLE supermarket.customer_order
 (
-  order_id       INT                 NOT NULL AUTO_INCREMENT
-    PRIMARY KEY,
+  order_id       INT                 NOT NULL auto_increment
+  PRIMARY KEY,
   customer       INT                 NULL,
   order_date     MEDIUMTEXT          NULL,
   order_subtotal DECIMAL DEFAULT '0' NULL,
@@ -41,8 +41,8 @@ CREATE INDEX discount_product_id_fk
 
 CREATE TABLE supermarket.employee
 (
-  emp_id       INT          NOT NULL AUTO_INCREMENT
-    PRIMARY KEY,
+  emp_id       INT          NOT NULL auto_increment
+  PRIMARY KEY,
   emp_name     VARCHAR(200) NULL,
   emp_password VARCHAR(256) NULL,
   emp_username VARCHAR(50)  NULL,
@@ -53,8 +53,7 @@ CREATE TABLE supermarket.employee
 
 COMMENT ON COLUMN employee.emp_role IS 'manager
 sales
-warehouse'
-;
+warehouse';
 
 CREATE TABLE supermarket.order_item
 (
@@ -74,9 +73,9 @@ CREATE INDEX order_item_product_prod_id_fk
 
 CREATE TABLE supermarket.product
 (
-  prod_id              INT                      NOT NULL AUTO_INCREMENT
-    PRIMARY KEY,
-  prod_name            VARCHAR(50)              NULL,
+  prod_id              INT                      NOT NULL auto_increment
+  PRIMARY KEY,
+  prod_name            VARCHAR(200)             NULL,
   prod_unit_price      DECIMAL DEFAULT '0'      NULL,
   prod_stock_level     INT                      NULL,
   prod_replenish_level INT                      NULL,
@@ -97,8 +96,8 @@ FOREIGN KEY (product) REFERENCES supermarket.product (prod_id);
 
 CREATE TABLE supermarket.purchase_order
 (
-  prd__id  INT        NOT NULL AUTO_INCREMENT
-    PRIMARY KEY,
+  prd__id  INT        NOT NULL auto_increment
+  PRIMARY KEY,
   prd_date MEDIUMTEXT NULL,
   employee INT        NULL,
   supplier INT        NULL,
@@ -127,8 +126,8 @@ CREATE INDEX purchase_order_item_purchase_order_prd__id_fk
 
 CREATE TABLE supermarket.supplier
 (
-  sup_id       INT          NOT NULL AUTO_INCREMENT
-    PRIMARY KEY,
+  sup_id       INT          NOT NULL auto_increment
+  PRIMARY KEY,
   sup_name     VARCHAR(100) NULL,
   sup_address  VARCHAR(200) NULL,
   sup_postcode INT          NULL,
