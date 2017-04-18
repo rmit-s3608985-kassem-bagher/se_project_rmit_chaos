@@ -149,6 +149,40 @@ class product
     }
 
     /**
+     * @url POST /{product_id}/update_replenish
+     * @param $product_id
+     * @param $price
+     * @return stdClass
+     */
+        public function editReplenishLevel($product_id,$level)
+    {
+        $con = mysqli_connect('localhost', 'root', '', 'supermarket');
+        $con->set_charset("utf8");
+        $result = mysqli_query($con, "update product set prod_replenish_level = $level where prod_id=$product_id ");
+        if (!$result)
+            throw new RestException(400, "could not update product replenish level");
+
+        return $this->getProduct($product_id);
+    }
+
+    /**
+     * @url POST /{product_id}/update_stock
+     * @param $product_id
+     * @param $price
+     * @return stdClass
+     */
+    public function editStockLevel($product_id,$level)
+    {
+        $con = mysqli_connect('localhost', 'root', '', 'supermarket');
+        $con->set_charset("utf8");
+        $result = mysqli_query($con, "update product set prod_stock_level = $level where prod_id=$product_id ");
+        if (!$result)
+            throw new RestException(400, "could not update product stock level");
+
+        return $this->getProduct($product_id);
+    }
+
+    /**
      * @url POST /{product_id}/update_discount
      * @param $product_id
      * @param $old_percentage

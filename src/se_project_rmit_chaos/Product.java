@@ -103,21 +103,41 @@ public class Product {
 	return stockLevel;
     }
     public boolean setStockLevel(double newLevel){
-	// TODO: call the update stock level on the server
-	
-	this.replenishLevel = newLevel;
+	HttpResponse<JsonNode> request = null;
+	try {
+	    request = Unirest
+		    .post("http://localhost/supermarket/api.php/product/{id}/update_stock")
+		    .header("accept", "application/json")
+		    .header("Content-Type", "application/json")
+		    .routeParam("id",Integer.toString(this.id))
+		    .queryString("key", "519428fdced64894bb10cd90bd87167c")
+		    .queryString("level", newLevel)
+		    .asJson();
+	} catch (UnirestException e) {
+	    e.printStackTrace();
+	    return false;
+	}
+	// retrieve the parsed JSONObject from the response
+	JSONObject json = request.getBody().getObject();
+	if (json.has("error")) {
+	    System.err.println(json.getJSONObject("error").getString("message"));
+	    return false;
+	}
+	if(json.getJSONObject("product")==null){
+	    System.err.println("could not edit product's stock level");
+	    return false;
+	}
+	json = json.getJSONObject("product");
+	this.stockLevel = json.getInt("stock_level");
 	return true;
     }
     
     public double increaseStockLevel(double quantity){
-	// TODO: call the update stock level on the server
-	
 	this.stockLevel += quantity;
 	return this.stockLevel ;
     }
     
     public double decreaseStockLevel(double quantity){
-	// TODO: call the update stock level on the server
 	this.stockLevel -= quantity;
 	return this.stockLevel ;
     }
@@ -138,10 +158,33 @@ public class Product {
     public double getReplenishLevel() {
 	return replenishLevel;
     }
-    public boolean setReplenishhLevel(double newLevel){
-	// TODO: call the update replenish level on the server
-	
-	this.replenishLevel = newLevel;
+    public boolean setReplenishLevel(double newLevel){
+	HttpResponse<JsonNode> request = null;
+	try {
+	    request = Unirest
+		    .post("http://localhost/supermarket/api.php/product/{id}/update_replenish")
+		    .header("accept", "application/json")
+		    .header("Content-Type", "application/json")
+		    .routeParam("id",Integer.toString(this.id))
+		    .queryString("key", "519428fdced64894bb10cd90bd87167c")
+		    .queryString("level", newLevel)
+		    .asJson();
+	} catch (UnirestException e) {
+	    e.printStackTrace();
+	    return false;
+	}
+	// retrieve the parsed JSONObject from the response
+	JSONObject json = request.getBody().getObject();
+	if (json.has("error")) {
+	    System.err.println(json.getJSONObject("error").getString("message"));
+	    return false;
+	}
+	if(json.getJSONObject("product")==null){
+	    System.err.println("could not edit product's replenish level");
+	    return false;
+	}
+	json = json.getJSONObject("product");
+	this.replenishLevel = json.getDouble("replenish_level");
 	return true;
     }
     
