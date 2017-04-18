@@ -15,16 +15,82 @@ class product
      * @access private
      * @param $product_id
      */
-    public function increaseStockLevel($con,$product_id, $quantity)
+    public function increaseStockLevel($con, $product_id, $quantity)
     {
         if ($con == null)
             $con = mysqli_connect('localhost', 'root', '', 'supermarket');
 
         $con->set_charset("utf8");
-        $result = mysqli_query($con,"update product set prod_stock_level =prod_stock_level+$quantity where prod_id=$product_id");
+        $result = mysqli_query($con, "update product set prod_stock_level =prod_stock_level+$quantity where prod_id=$product_id");
         if (!$result)
             return false;
         return true;
+    }
+
+    private function getDiscount($product_id, $percentage, $quantity)
+    {
+        $con = mysqli_connect('localhost', 'root', '', 'supermarket');
+        $con->set_charset("utf8");
+        $result = mysqli_query($con, "select * from discount where disc_quantity=$quantity and disc_percentage=$percentage and product = $product_id");
+        $row = $result->fetch_assoc();
+
+        if ($row == null) {
+            $res = new stdClass();
+            $res->discount = null;
+            return $res;
+        }
+
+        $discount = new stdClass();
+        $discount->quantity = $row['disc_quantity'];
+        $discount->percentage = $row['disc_percentage'];
+        $res = new stdClass();
+        $res->discount = $discount;
+        return $res;
+    }
+
+    /**
+     * @url POST /{product_id}/update_discount
+     * @param $product_id
+     * @param $old_percentage
+     * @param $old_quantity
+     * @param $new_percentage
+     * @param $new_quantity
+     * @return updated discount
+     */
+    public function editDiscount($product_id, $old_percentage, $old_quantity, $new_percentage, $new_quantity)
+    {
+        $con = mysqli_connect('localhost', 'root', '', 'supermarket');
+        $con->set_charset("utf8");
+        $result = mysqli_query($con, "update discount set disc_percentage=$new_percentage,disc_quantity=$new_quantity where disc_quantity=$old_quantity and disc_percentage=$old_percentage and product=$product_id");
+        if (!$result)
+            throw new RestException(400, "could not update discount");
+
+        return $this->getDiscount($product_id, $new_percentage, $new_quantity);
+    }
+
+    /**
+     * @url GET /
+     * @return array
+     */
+    public function listAllProducts()
+    {
+        $con = mysqli_connect('localhost', 'root', '', 'supermarket');
+        $con->set_charset("utf8");
+        $result = mysqli_query($con, "select * from product");
+        $products = array();
+        while ($row = mysqli_fetch_array($result)) {
+            $prod = array(
+                'id' => $row['prod_id'],
+                'name' => $row['prod_name'],
+                'unit_price' => $row['prod_unit_price'],
+                'stock_level' => $row['prod_stock_level'],
+                'replenish_level' => $row['prod_replenish_level'],
+                'type' => $row['prod_type'],
+                'discounts' => $this->getProductDiscounts($row['prod_id']));
+            $products[] = $prod;
+        }
+        mysqli_close($con);
+        return $products;
     }
 
     /**

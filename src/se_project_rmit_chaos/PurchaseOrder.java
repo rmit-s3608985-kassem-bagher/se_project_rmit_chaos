@@ -29,10 +29,6 @@ public class PurchaseOrder {
     }
 
     public boolean placeOrder() {
-	/*
-	 * TODO: call API to place order and increase stock level, on success,
-	 * complete the below steps
-	 */
 	this.date = System.currentTimeMillis() / 1000l;
 	Gson gson = new Gson();
 	PurchaseOrder pr = this;

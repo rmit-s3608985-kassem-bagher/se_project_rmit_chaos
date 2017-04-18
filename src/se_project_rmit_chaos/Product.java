@@ -2,6 +2,16 @@ package se_project_rmit_chaos;
 
 import java.util.ArrayList;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
+
 public class Product {
     private int id;
     private String name;
@@ -16,21 +26,25 @@ public class Product {
     }
     
     public static ArrayList<Product> fetchProductsFromServer(){
-	// TODO: fetch from server, loop and store in array
-	/*
-	 *  the caller should keep track of the products
-	 *  calling this method may cause referencing problem
-	 *  use it wisely 
-	 */
-	
-	// TODO: remove dummy data
-	ArrayList<Product> prs = new ArrayList<Product>();
-	prs.add(new Product(1, "Mango", 2.0, 20, 10, UnitType.kg, new ArrayList<Discount>()));
-	prs.add(new Product(1, "Carrot", 4.5, 10, 10, UnitType.kg, new ArrayList<Discount>()));
-	prs.add(new Product(1, "Water", 1.5, 5, 20, UnitType.pcs, new ArrayList<Discount>()));
-	prs.add(new Product(1, "Pepsi", 3.5, 20, 10, UnitType.pcs, new ArrayList<Discount>()));
-	
-	return prs;
+	HttpResponse<JsonNode> request = null;
+	try {
+	    request = Unirest
+		    .get("http://localhost/supermarket/api.php/product/")
+		    .header("accept", "application/json")
+		    .queryString("key", "519428fdced64894bb10cd90bd87167c")
+		    .asJson();
+	} catch (UnirestException e) {
+	    e.printStackTrace();
+	    return null;
+	}
+	// retrieve the parsed JSONObject from the response
+	if (!request.getBody().isArray()) {
+	    JSONObject json = request.getBody().getObject();
+	    if(json.has("error"))
+		System.err.println(json.getJSONObject("error").getString("message"));
+	    return null;
+	}	
+	return JsonParser.parseProducts(request.getBody().getArray());
     }
 
     private void updateProductInfo(int id, String name, double unitPrice, int stockLevel, double replenishLevel, UnitType type,ArrayList<Discount> discounts){
@@ -109,9 +123,36 @@ public class Product {
     
     public boolean editDiscount(Discount dc,int quantity, double percentage){
 	// TODO: edit discount on server
-	
-	dc.setPercentage(percentage);
-	dc.setQuantity(quantity);
+	HttpResponse<JsonNode> request = null;
+	try {
+	    request = Unirest
+		    .post("http://localhost/supermarket/api.php/product/{id}/update_discount")
+		    .header("accept", "application/json")
+		    .header("Content-Type", "application/json")
+		    .routeParam("id",Integer.toString(this.id))
+		    .queryString("key", "519428fdced64894bb10cd90bd87167c")
+		    .queryString("old_percentage", dc.getPercentage())
+		    .queryString("new_percentage", percentage)
+		    .queryString("old_quantity", dc.getQuantity())
+		    .queryString("new_quantity", quantity)
+		    .asJson();
+	} catch (UnirestException e) {
+	    e.printStackTrace();
+	    return false;
+	}
+	// retrieve the parsed JSONObject from the response
+	JSONObject json = request.getBody().getObject();
+	if (json.has("error")) {
+	    System.err.println(json.getJSONObject("error").getString("message"));
+	    return false;
+	}
+	if(json.getJSONObject("discount")==null){
+	    System.err.println("could not edit discount");
+	    return false;
+	}
+	json = json.getJSONObject("discount");
+	dc.setPercentage(json.getInt("percentage"));
+	dc.setQuantity(json.getInt("quantity"));
 	return true;
     }
     

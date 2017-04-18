@@ -61,9 +61,12 @@ class purchaseorder
         mysqli_commit($con);
         mysqli_close($con);
 
+
         $responce = new stdClass();
         $responce->code = "200";
         $responce->message = "Prchase order placed";
-        return $responce;
+        $res = new stdClass();
+        $res->responce = $responce;
+        return $res;
     }
 }
