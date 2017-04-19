@@ -19,8 +19,10 @@ CREATE TABLE supermarket.customer_order
   order_date     MEDIUMTEXT          NULL,
   order_subtotal DECIMAL DEFAULT '0' NULL,
   order_total    DECIMAL DEFAULT '0' NULL,
-  order_discount DECIMAL DEFAULT '0' NULL,
   order_status   VARCHAR(20)         NULL,
+  order_discount DOUBLE DEFAULT '0'  NULL,
+  order_points   INT DEFAULT '0'     NULL,
+  bonus_points   INT DEFAULT '0'     NULL,
   CONSTRAINT customer_order_customer_cust_id_fk
   FOREIGN KEY (customer) REFERENCES supermarket.customer (cust_id)
 );
@@ -57,10 +59,11 @@ warehouse';
 
 CREATE TABLE supermarket.order_item
 (
-  cust_order    INT NULL,
-  product       INT NULL,
-  item_quantity INT NULL,
-  item_total    INT NULL,
+  cust_order    INT                 NULL,
+  product       INT                 NULL,
+  item_quantity INT                 NULL,
+  item_total    INT                 NULL,
+  item_discount DECIMAL DEFAULT '0' NULL,
   CONSTRAINT order_item_order_id_fk
   FOREIGN KEY (cust_order) REFERENCES supermarket.customer_order (order_id)
 );
