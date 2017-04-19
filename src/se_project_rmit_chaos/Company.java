@@ -78,10 +78,22 @@ public class Company
        
 //       Product.fetchProductsFromServer();
        ArrayList<Supplier> sup = Supplier.fetchSuppliersFromServer();
-       Discount disc = sup.get(0).getSupplierProducts().get(0).getDiscounts().get(0);
+       Customer cu = new Customer("kassem", "kassem123");
+       Order or=null;
+    try {
+	or = new Order(cu);
+    } catch (UnirestException e) {
+	e.printStackTrace();
+    }
+//       or.addProduct(sup.get(0).getSupplierProducts().get(0), 5);
+       or.addProduct(sup.get(0).getSupplierProducts().get(0), 5);
+       
+//       or.placeOrder();
+       
+//       Discount disc = sup.get(0).getSupplierProducts().get(0).getDiscounts().get(0);
 //       sup.get(0).getSupplierProducts().get(0).deleteDiscount(disc);
 //       sup.get(0).getSupplierProducts().get(0).addDiscount(100, 100);
-       sup.get(0).getSupplierProducts().get(0).editUnitPrice(100);
+//       sup.get(0).getSupplierProducts().get(0).editUnitPrice(100);
 //       sup.get(0).getSupplierProducts().get(0).deleteDiscount(disc);
 //       sup.get(0).getSupplierProducts().get(0).editDiscount(disc, 1, 2);
 ////       System.out.println(sup.get(0).getSupplierProducts().get(1).getDiscounts().get(1).getPercentage());

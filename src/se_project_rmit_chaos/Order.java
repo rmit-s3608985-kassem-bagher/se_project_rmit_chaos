@@ -2,23 +2,35 @@ package se_project_rmit_chaos;
 
 import java.util.*;
 
+import org.json.JSONObject;
+
+import com.google.gson.Gson;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
+
 class Order {
-    private int id;
-    private long date;
-    private double total; // after applying discount
-    private double subtotal; // before discount
-    private double pointsDiscount; // customer's points discount
-    private Customer customer;
+    private int id = 0;
+    private long date = 0;
+    private double total = 0; // after applying discount
+    private double subtotal = 0; // before discount
+    private double pointsDiscount = 0; // customer's points discount
+    private Customer customer = null;
     private ArrayList<OrderItem> orderItems = new ArrayList<OrderItem>();
     private OrderStatus status = OrderStatus.pending;
 
-    public Order(Customer customer) {
+    public Order(Customer customer) throws UnirestException {
 	this.customer = customer;
-	/*
-	 *  call API and place order
-	 *  get order id from API
-	 */
-	this.id = 1; // get from server
+	HttpResponse<JsonNode> request = null;
+	request = Unirest.post("http://localhost/supermarket/api.php/order/add").header("accept", "application/json")
+		.header("Content-Type", "application/json").queryString("key", "519428fdced64894bb10cd90bd87167c")
+		.queryString("customer_id", customer.getId()).asJson();
+	JSONObject json = request.getBody().getObject();
+	if (json.has("error")) {
+	    System.err.println(json.getJSONObject("error").getString("message"));
+	}
+	this.id = json.getJSONObject("responce").getInt("order_id");
     }
 
     public int getID() {
@@ -29,6 +41,9 @@ class Order {
 	return date;
     }
 
+    /**
+     * @deprecated not used anuymore
+     */
     private void computeTotal() {
 	this.subtotal = 0;
 	// calculate subtotal
@@ -49,11 +64,26 @@ class Order {
 	    System.err.println("Cannot add products to a canceled order");
 	    return false;
 	}
-	if (qty > pr.getStockLevel()) {
-	    System.err.println("only " + pr.getStockLevel() + " products remaining");
+
+	HttpResponse<JsonNode> request = null;
+	try {
+	    request = Unirest.post("http://localhost/supermarket/api.php/order/{id}/add_item")
+		    .header("accept", "application/json").routeParam("id", Integer.toString(this.id))
+		    .header("Content-Type", "application/json").queryString("key", "519428fdced64894bb10cd90bd87167c")
+		    .queryString("product_id", pr.getID()).queryString("quantity", qty).asJson();
+	} catch (UnirestException e) {
+	    e.printStackTrace();
 	    return false;
 	}
-	OrderItem item = new OrderItem(pr, qty, this);
+	// retrieve the parsed JSONObject from the response
+	JSONObject json = request.getBody().getObject();
+	if (json.has("error")) {
+	    System.err.println(json.getJSONObject("error").getString("message"));
+	    return false;
+	}
+
+	// TODO: update item info if exists (parse response from API)
+	OrderItem item = new OrderItem(pr, qty);
 	this.orderItems.add(item);
 	return true;
     }
@@ -95,32 +125,25 @@ class Order {
     }
 
     public boolean placeOrder() {
-	/*
-	 * TODO: call API (first check with server for stock level) add items to
-	 * order update total deduct user's balance deduct user's points
-	 * decrease stock level
-	 * if equals or below replenish level, place order automatically
-	 * App should sync data everytime user goes back to menu 
-	 */
-	if (this.status != OrderStatus.pending) {
-	    System.err.println("order needs to be pending");
+	HttpResponse<JsonNode> request = null;
+	try {
+	    request = Unirest.post("http://localhost/supermarket/api.php/order/{id}/place")
+		    .header("accept", "application/json")
+		    .routeParam("id", Integer.toString(this.getID()))
+		    .header("Content-Type", "application/json")
+		    .queryString("key", "519428fdced64894bb10cd90bd87167c")
+		    .queryString("customer_id",this.customer.getId())
+		    .asJson();
+	} catch (UnirestException e) {
+	    e.printStackTrace();
 	    return false;
 	}
-	computeTotal();
-	// check if customer has enough balance
-	if (this.total > this.customer.getBalance() && this.total > this.customer.getPointsDiscount(this.subtotal)) {
-	    System.err.println("no enough balance or points");
+	// retrieve the parsed JSONObject from the response
+	JSONObject json = request.getBody().getObject();
+	if (json.has("error")) {
+	    System.err.println(json.getJSONObject("error").getString("message"));
 	    return false;
 	}
-
-	// TODO: call API to place order, on success, complete the below steps
-	this.customer.deductBalance(this.total);
-	this.customer.deductPoints(subtotal);
-	for (OrderItem oi : orderItems) {
-	    oi.getProduct().decreaseStockLevel(oi.getQuantity());
-	}
-	this.date = System.currentTimeMillis() / 1000l;
-	this.status = OrderStatus.placed;
 	return true;
     }
 

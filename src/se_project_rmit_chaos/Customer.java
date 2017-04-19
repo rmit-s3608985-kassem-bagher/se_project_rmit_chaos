@@ -74,6 +74,11 @@ public class Customer {
 	this.balance += amount;
     }
 
+    /**
+     * @deprecated deducted on API
+     * @param amount
+     * @return
+     */
     public boolean deductBalance(double amount) {
 	this.balance -= amount;
 	return true;
@@ -81,6 +86,10 @@ public class Customer {
 
     public int getPoints() {
 	return this.points;
+    }
+    
+    public int getId() {
+	return this.id;
     }
 
     public double getPointsDiscount(double orderSubtotal) {
@@ -93,6 +102,11 @@ public class Customer {
 	return true;
     }
 
+    /**
+     * @deprecated deducted on API
+     * @param subtotal
+     * @return
+     */
     public boolean deductPoints(double subtotal) {
 	int points = (int) (Math.floor(this.points / 20.0)) * 20;
 	this.points -= points;

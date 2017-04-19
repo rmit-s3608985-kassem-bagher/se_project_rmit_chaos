@@ -9,6 +9,148 @@
  */
 class customer
 {
+    private function encodeCustomerIntoJson($customer)
+    {
+        $cust = new stdClass();
+        $cust->id = $customer['cust_id'];
+        $cust->name = $customer['cust_name'];
+        $cust->balance = $customer['cust_balance'];
+        $cust->points = $customer['cust_points'];
+        return $cust;
+    }
+
+    private function getCustomerById($customer_id)
+    {
+        $con = mysqli_connect('localhost', 'root', '', 'supermarket');
+        $con->set_charset("utf8");
+        $result = mysqli_query($con, "select * from customer where cust_id = $customer_id");
+        $row = $result->fetch_assoc();
+        mysqli_close($con);
+        return customer::encodeCustomerIntoJson($row);
+    }
+
+    /**
+     * @access private
+     * @param $con
+     * @param $customer_id
+     * @param $amount
+     */
+    public function deductBalance($con,$customer_id,$amount){
+        $close = false;
+        if ($con==null){
+            $close=true;
+            $con = mysqli_connect('localhost', 'root', '', 'supermarket');
+        }
+        $con->set_charset("utf8");
+        $result = mysqli_query($con, "update customer set cust_balance=cust_balance-$amount where cust_id=$customer_id");
+        if ($close)
+            mysqli_close($con);
+        if(!$result)
+            return false;
+        return true;
+    }
+
+    /**
+     * @access private
+     * @param $con
+     * @param $customer_id
+     * @param $points
+     * @return bool
+     */
+    public function deductPoints($con,$customer_id,$points){
+        $close = false;
+        if ($con==null){
+            $close=true;
+            $con = mysqli_connect('localhost', 'root', '', 'supermarket');
+        }
+        $con->set_charset("utf8");
+        $result = mysqli_query($con, "update customer set cust_points=cust_points-$points where cust_id=$customer_id");
+        if ($close)
+            mysqli_close($con);
+        if(!$result)
+            return false;
+        return true;
+    }
+
+    /**
+     * @access private
+     * @param $customer_id
+     */
+    public function getBalance($customer_id){
+        return customer::getCustomerById($customer_id)->balance;
+    }
+
+    public function getPoints($customer_id){
+        return customer::getCustomerById($customer_id)->points;
+    }
+
+    /**
+     * @access private
+     * @param $customer_id
+     * @param $order_id
+     */
+    public function canPlaceOrder($customer_id,$order_id){
+        $order_total = order::calculateOrderTotal($order_id);
+        $balance = customer::getBalance($customer_id);
+        $points = customer::getPoints($customer_id);
+        $points_value= floor($points / 20);
+        if($order_total>($balance+$points_value))
+            return false;
+        return true;
+    }
+
+    /**
+     * @url POST /{customer_id}/add_balance
+     * @param $customer_id
+     * @param $amount
+     * @return bool
+     */
+    public function addBalance($customer_id, $amount)
+    {
+        $con = mysqli_connect('localhost', 'root', '', 'supermarket');
+        $con->set_charset("utf8");
+        $result = mysqli_query($con, "update customer set cust_balance =cust_balance+$amount where cust_id=$customer_id");
+        mysqli_close($con);
+
+        if (!$result)
+            throw new RestException(401, 'could not add balance to customer');
+
+        return $this->getCustomerById($customer_id);
+    }
+
+    /**
+     * @access private
+     * @param $customer_id
+     * @param $points
+     * @param $con
+     * @return stdClass
+     */
+    public function addPoints($con,$customer_id, $points)
+    {
+        $close = false;
+        if ($con==null){
+            $close=true;
+            $con = mysqli_connect('localhost', 'root', '', 'supermarket');
+        }
+        $con->set_charset("utf8");
+        $result = mysqli_query($con, "update customer set cust_points =cust_points+$points where cust_id=$customer_id");
+
+        if ($close)
+            mysqli_close($con);
+
+        if (!$result)
+            return false;
+        return true;
+    }
+
+
+
+    /**
+     * @url GET /login
+     * @param $username
+     * @param $password
+     * @return stdClass
+     */
     public function login($username, $password)
     {
         $con = mysqli_connect('localhost', 'root', '', 'supermarket');
@@ -19,11 +161,6 @@ class customer
         if ($row == null)
             throw new RestException(401, 'username and password not found');
 
-        $customer = new stdClass();
-        $customer->id = $row['cust_id'];
-        $customer->name = $row['cust_name'];
-        $customer->balance = $row['cust_balance'];
-        $customer->points = $row['cust_points'];
-        return $customer;
+        return $this->encodeCustomerIntoJson($row);
     }
 }

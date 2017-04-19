@@ -32,16 +32,44 @@ class purchaseorder
 
     /**
      *
-     * @url POST /
-     * @param $request_data jason body
+     * @access private
+     * @param $product_id
      */
-    public function index($request_data)
+    public function autoPurchaseOrder($product_id){
+        $product = product::getProduct($product_id)->product;
+        if ($product->stock_level >= $product->replenish_level)
+            return;
+
+        $emp = new stdClass();
+        $emp->id = 1;
+
+        $orderItems = array();
+        $item = new stdClass();
+        $item->total = $product->unit_price * $product->replenish_level;
+        $item->quantity = $product->replenish_level;
+        $item->product = $product;
+        $orderItems[] = $item;
+
+        $order = array(
+            'supplier' => json_decode(json_encode(supplier::getProductSupplier($product_id)), true),
+            'employee' => json_decode(json_encode($emp), true),
+            'orderItems' => json_decode(json_encode($orderItems), true));
+        purchaseorder::placePurchaseOrder($order);
+    }
+
+    /**
+     *
+     * @url POST /
+     * @param $request_data purchase order jason body
+     */
+    public function placePurchaseOrder($request_data)
     {
         $con = mysqli_connect('localhost', 'root', '', 'supermarket');
         $con->set_charset("utf8");
         mysqli_autocommit($con, false);
         // add purchase order record
-        $result = $this->addPurchaseOrderRecord($con, $request_data["date"], $request_data["employee"]["id"], $request_data["supplier"]["id"]);
+        $date = time();
+        $result = purchaseorder::addPurchaseOrderRecord($con, $date, $request_data["employee"]["id"], $request_data["supplier"]["id"]);
         if ($result == 0) {
             mysqli_rollback($con);
             mysqli_close($con);
@@ -51,7 +79,9 @@ class purchaseorder
         // add purchase prder item records
         $purchase_order_id = $result;
         foreach ($request_data["orderItems"] as $item) {
-            $result = $this->addPurchaseOrderItemRecord($con, $purchase_order_id,$item["product"]["id"],$item["quantity"],$item["total"]);
+            $product = product::getProduct($item["product"]["id"]);
+            $total = $product->product->unit_price * $item["quantity"];
+            $result = purchaseorder::addPurchaseOrderItemRecord($con, $purchase_order_id,$item["product"]["id"],$item["quantity"],$total);
             if (!$result) {
                 mysqli_rollback($con);
                 mysqli_close($con);

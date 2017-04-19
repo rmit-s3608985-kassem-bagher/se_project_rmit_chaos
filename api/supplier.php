@@ -39,6 +39,25 @@ class supplier
     }
 
     /**
+     * @access private
+     * @param $product_id
+     * @return stdClass
+     */
+    public function getProductSupplier($product_id){
+        $con = mysqli_connect('localhost', 'root', '', 'supermarket');
+        $con->set_charset("utf8");
+        $result = mysqli_query($con, "select * from supplier JOIN product on supplier.sup_id = product.supplier where prod_id=$product_id");
+        $row = $result->fetch_assoc();
+
+        mysqli_close($con);
+
+        if ($row == null)
+            return null;
+
+        return supplier::encodeSupplierIntoJson($row);
+    }
+
+    /**
      * @url GET /{suppiler_id}/products
      * @url GET /products
      * @param $suppiler_id supplier id
@@ -73,7 +92,7 @@ class supplier
         $sup->address = $supplier['sup_address'];
         $sup->postcode = $supplier['sup_postcode'];
         $sup->phone = $supplier['sup_phone'];
-        $sup->products = $this->getSupplierProducts($supplier['sup_id']);
+        $sup->products = supplier::getSupplierProducts($supplier['sup_id']);
         return $sup;
     }
 

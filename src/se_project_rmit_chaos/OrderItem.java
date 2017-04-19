@@ -1,16 +1,10 @@
 package se_project_rmit_chaos;
 
 public class OrderItem extends Item {
-    private Order order;
     private double total;
 
-    public OrderItem(Product p, int qty, Order order) {
+    public OrderItem(Product p, int qty) {
 	super(qty, p);
-	this.order = order;
-    }
-
-    public Order getOrder() {
-	return order;
     }
 
     @Override
@@ -25,6 +19,7 @@ public class OrderItem extends Item {
 	for (Discount disc : this.product.getDiscounts()) {
 	    if (quantity >= disc.getQuantity()) { // discount applies
 		double tmp = (this.product.getUnitPrice() * disc.getQuantity()) * (disc.getPercentage() / 100);
+		System.out.println(tmp);
 		bulkPrice = bulkPrice > tmp ? bulkPrice : tmp;
 	    }
 	}

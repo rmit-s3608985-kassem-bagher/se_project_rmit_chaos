@@ -17,18 +17,68 @@ class product
      */
     public function increaseStockLevel($con, $product_id, $quantity)
     {
-        if ($con == null)
+        $close = false;
+        if ($con == null){
+            $close = true;
             $con = mysqli_connect('localhost', 'root', '', 'supermarket');
+        }
+
 
         $con->set_charset("utf8");
         $result = mysqli_query($con, "update product set prod_stock_level =prod_stock_level+$quantity where prod_id=$product_id");
+        if($close)
+            mysqli_close($con);
+
         if (!$result)
             return false;
         return true;
     }
 
+    /**
+     * @access private
+     * @param $product_id
+     */
+    public function decreaseStockLevel($con, $product_id, $quantity)
+    {
+        $close = false;
+        if ($con == null) {
+            $close = true;
+            $con = mysqli_connect('localhost', 'root', '', 'supermarket');
+        }
 
-    private function getProduct($product_id)
+        $con->set_charset("utf8");
+        $result = mysqli_query($con, "update product set prod_stock_level =prod_stock_level-$quantity where prod_id=$product_id");
+        if($close)
+            mysqli_close($con);
+
+        if (!$result)
+            return false;
+        return true;
+    }
+
+    /**
+     * @access private
+     * @param $product_id
+     * @param $qty
+     */
+    public function calculatePrice($product_id, $qty){
+        $product = product::getProduct($product_id)->product;
+        $price = $product->unit_price * $qty;
+        $bulk_price = 0;
+        foreach ($product->discounts as $disc){
+            if($qty >= $disc["quantity"]){
+                $tmp = ($product->unit_price * $disc["quantity"]) * ($disc["percentage"] /100);
+                $bulk_price = $bulk_price > $tmp ? $bulk_price : $tmp;
+            }
+        }
+        return $price - $bulk_price;
+    }
+
+    /**
+     * @access private
+     * @param $product_id
+     */
+    public function getProduct($product_id)
     {
         $con = mysqli_connect('localhost', 'root', '', 'supermarket');
         $con->set_charset("utf8");
@@ -48,7 +98,7 @@ class product
         $product->stock_level= $row['prod_stock_level'];
         $product->replenish_level= $row['prod_replenish_level'];
         $product->type= $row['prod_type'];
-        $product->discounts= $this->getProductDiscounts($row['prod_id']);
+        $product->discounts=  product::getProductDiscounts($row['prod_id']);
 
         $res = new stdClass();
         $res->product = $product;
@@ -226,6 +276,8 @@ class product
         mysqli_close($con);
         return $products;
     }
+
+
 
     /**
      * @url GET /discounts

@@ -137,6 +137,11 @@ public class Product {
 	return this.stockLevel ;
     }
     
+    /**
+     * @deprecated decreased on API
+     * @param quantity
+     * @return
+     */
     public double decreaseStockLevel(double quantity){
 	this.stockLevel -= quantity;
 	return this.stockLevel ;
