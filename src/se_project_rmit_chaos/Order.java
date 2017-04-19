@@ -89,11 +89,26 @@ class Order {
     }
 
     public boolean removeProduct(OrderItem item) {
-	if (this.status == OrderStatus.canceled) {
-	    System.err.println("Cannot remove products to a canceled order");
-	    return false;
+	HttpResponse<JsonNode> request = null;
+	try {
+		request = Unirest
+			.post("http://localhost/supermarket/api.php/order/{id}/remove_item")
+			.header("accept", "application/json")
+			.header("Content-Type", "application/json")
+			.routeParam("id", Integer.toString(this.getID()))
+			.queryString("key", "519428fdced64894bb10cd90bd87167c")
+			.queryString("product_id", Integer.toString(item.product.getID()))
+			.asJson();
+	} catch (UnirestException e) {
+		e.printStackTrace();
+		return false;
 	}
-	this.orderItems.remove(item);
+	// retrieve the parsed JSONObject from the response
+	JSONObject json = request.getBody().getObject();
+	if (json.has("error")) {
+		System.err.println(json.getJSONObject("error").getString("message"));
+		return false;
+	}
 	return true;
     }
 
