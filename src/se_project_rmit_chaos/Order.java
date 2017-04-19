@@ -113,21 +113,25 @@ class Order {
     }
 
     public boolean cancelOrder() {
-	// TODO: call the API and complete on success (server will do similar
-	// logic)
-	if (this.status == OrderStatus.pending) { // no deduction or anything
-	    this.status = OrderStatus.canceled;
-	    return true;
-	} else if (this.status == OrderStatus.placed) {
-	    this.status = OrderStatus.canceled;
-	    this.customer.increaseBalance(this.total);
-	    this.customer.addPoints(this.subtotal);
-	    for (OrderItem oi : orderItems) {
-		oi.getProduct().increaseStockLevel(oi.getQuantity());
-	    }
-	    return true;
+	HttpResponse<JsonNode> request = null;
+	try {
+		request = Unirest
+			.post("http://localhost/supermarket/api.php/order/{id}/cancel")
+			.header("accept", "application/json")
+			.header("Content-Type", "application/json")
+			.routeParam("id", Integer.toString(this.getID()))
+			.queryString("key", "519428fdced64894bb10cd90bd87167c")
+			.asJson();
+	} catch (UnirestException e) {
+		e.printStackTrace();
+		return false;
 	}
-
+	// retrieve the parsed JSONObject from the response
+	JSONObject json = request.getBody().getObject();
+	if (json.has("error")) {
+		System.err.println(json.getJSONObject("error").getString("message"));
+		return false;
+	}
 	return false;
     }
 
