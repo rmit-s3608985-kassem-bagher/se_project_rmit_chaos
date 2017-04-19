@@ -9,6 +9,7 @@ ____
 	- Client Side
 		- Java
 		- [Unirest](http://unirest.io) framework
+		- [Gson](https://github.com/google/gson) framework
 		- Maven
 - **Folders and files**
 	- api
