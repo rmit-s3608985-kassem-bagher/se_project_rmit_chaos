@@ -100,6 +100,34 @@ class customer
     }
 
     /**
+     * @access private
+     * @param $con
+     * @param $customer_id
+     * @param $amount
+     */
+    public function addBalanceForCustomer($con, $customer_id, $amount){
+        $close = false;
+        if ($con==null){
+            $close= true;
+            $con = mysqli_connect('localhost', 'root', '', 'supermarket');
+        }
+        $con->set_charset("utf8");
+        $result = mysqli_query($con, "update customer set cust_balance =cust_balance+$amount where cust_id=$customer_id");
+
+        if ($close)
+            mysqli_close($con);
+
+        if (!$result){
+            if ($close)
+                throw new RestException(401, 'could not add balance to customer');
+            return false;
+        }
+        if ($close)
+            return $this->getCustomerById($customer_id);
+        return true;
+    }
+
+    /**
      * @url POST /{customer_id}/add_balance
      * @param $customer_id
      * @param $amount
@@ -107,15 +135,7 @@ class customer
      */
     public function addBalance($customer_id, $amount)
     {
-        $con = mysqli_connect('localhost', 'root', '', 'supermarket');
-        $con->set_charset("utf8");
-        $result = mysqli_query($con, "update customer set cust_balance =cust_balance+$amount where cust_id=$customer_id");
-        mysqli_close($con);
-
-        if (!$result)
-            throw new RestException(401, 'could not add balance to customer');
-
-        return $this->getCustomerById($customer_id);
+        return $this->addBalanceForCustomer(null,$customer_id,$amount);
     }
 
     /**

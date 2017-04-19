@@ -109,6 +109,93 @@ class order
         return $res;
     }
 
+    private function updateOrderStatus($con,$order_id,$status){
+        $close = false;
+        if ($con==null){
+            $close= true;
+            $con = mysqli_connect('localhost', 'root', '', 'supermarket');
+        }
+        $con->set_charset("utf8");
+        $result = mysqli_query($con, "update customer_order set order_status='$status' where order_id = $order_id");
+
+        if ($close)
+            mysqli_close($con);
+
+        if (!$result)
+            return false;
+        return true;
+
+    }
+
+    /**
+     * @url POST /{order_id}/cancel
+     * @param $order_id
+     */
+    public function cancelOrder($order_id){
+        $order = order::getOrder($order_id);
+        if($order ->order->status == 'canceled')
+            throw new RestException(400,"order is already canceled");
+
+        // roll back in case of any error
+        $con = mysqli_connect('localhost', 'root', '', 'supermarket');
+        $con->set_charset("utf8");
+        mysqli_autocommit($con, false);
+
+        // increase stock level
+        foreach ($order->order->items as $item){
+            $status = product::increaseStockLevel($con,$item["product"]->id,$item["quantity"]);
+            if (!$status){
+                mysqli_rollback($con);
+                mysqli_close($con);
+                throw new RestException(400, 'could not cancel order: increase stock level');
+            }
+        }
+
+        if($order ->order->status == 'placed'){
+            // increase customer's purchase points
+
+            if (!customer::addPoints($con,$order->order->customer_id,$order->order->points)){
+                mysqli_rollback($con);
+                mysqli_close($con);
+                throw new RestException(400, "could not cancel order: increase customer's purchase points");
+            }
+
+            // increase customer's balance
+            if (!customer::addBalanceForCustomer($con,$order->order->customer_id,$order->order->total)){
+                mysqli_rollback($con);
+                mysqli_close($con);
+                throw new RestException(400, "could not cancel order: increase customer's balance");
+            }
+
+            // decrease customer's bonus points
+            if (!customer::deductPoints($con,$order->order->customer_id,$order->order->bonus_points)){
+                mysqli_rollback($con);
+                mysqli_close($con);
+                throw new RestException(400, "could not cancel order: increase customer's balance");
+            }
+        }
+
+        // update order status
+        if (!order::updateOrderStatus($con,$order_id,'canceled')){
+            mysqli_rollback($con);
+            mysqli_close($con);
+            throw new RestException(400, 'could not cancel order: update status');
+        }
+
+        // commit changes to the db
+        mysqli_commit($con);
+        mysqli_close($con);
+
+
+        $responce = new stdClass();
+        $responce->code = "200";
+        $responce->message = "order canceled";
+        $res = new stdClass();
+        $res->responce = $responce;
+        return $res;
+
+    }
+
     /**
      * @url POST /{order_id}/add_item
      * @param $order_id
@@ -172,6 +259,7 @@ class order
         $order->status = $row["order_status"];
         $order->discount = $row["order_discount"];
         $order->points = $row["order_points"];
+        $order->bonus_points = $row["bonus_points"];
         $order->items = order::getOrderItems($order_id);
         $res->order = $order;
         return $res;
@@ -230,7 +318,6 @@ class order
 
         $con = mysqli_connect('localhost', 'root', '', 'supermarket');
         $con->set_charset("utf8");
-
         mysqli_autocommit($con, false);
 
 
@@ -253,9 +340,9 @@ class order
             throw new RestException(400, 'could not place order: customer deduct balance');
         }
 
-
+        $bonus_points = floor(($order_total/10));
         // add points to customer
-        if(!customer::addPoints($con,$customer_id,floor(($order_total/10)))){
+        if(!customer::addPoints($con,$customer_id,$bonus_points)){
             mysqli_rollback($con);
             mysqli_close($con);
             throw new RestException(400, 'could not place order: customer add points');
@@ -263,7 +350,7 @@ class order
 
         $time = time();
         // update order
-        $result = mysqli_query($con,"update customer_order set order_date='$time',order_subtotal=$order_total,order_discount= $points_used_value,order_total=$order_total-$points_used_value,order_status='placed',order_points=$points_used where order_id=$order_id");
+        $result = mysqli_query($con,"update customer_order set order_date='$time',order_subtotal=$order_total,order_discount= $points_used_value,order_total=$order_total-$points_used_value,order_status='placed',order_points=$points_used,bonus_points=$bonus_points where order_id=$order_id");
 
         if (!$result){
             mysqli_rollback($con);
@@ -271,7 +358,6 @@ class order
             throw new RestException(400, 'could not place order: finalise order');
         }
 
-//        mysqli_rollback($con);
         mysqli_commit($con);
         mysqli_close($con);
 

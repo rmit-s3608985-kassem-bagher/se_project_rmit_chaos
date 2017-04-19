@@ -113,14 +113,6 @@ class Order {
     }
 
     public boolean cancelOrder() {
-	if (this.status == OrderStatus.canceled) {
-	    System.err.println("order canceled already ");
-	    return false;
-	}
-	if (this.status == OrderStatus.pending) {
-	    System.err.println("cannot cancel pending orders.\nOrder must be placed first");
-	    return false;
-	}
 	// TODO: call the API and complete on success (server will do similar
 	// logic)
 	if (this.status == OrderStatus.pending) { // no deduction or anything
