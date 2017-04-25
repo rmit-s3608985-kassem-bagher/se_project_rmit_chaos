@@ -1,4 +1,4 @@
-package se_project_rmit_chaos;
+package au.edu.rmit.chaos;
 
 public class PurchaseOrderItem extends Item {
 
