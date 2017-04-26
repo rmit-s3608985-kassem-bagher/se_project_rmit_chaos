@@ -53,8 +53,14 @@ class order
     private function increaseOrderItemQuantity($order_id,$product_id,$quantity){
         $con = mysqli_connect('localhost', 'root', '', 'supermarket');
         $con->set_charset("utf8");
-        $total = product::calculatePrice($product_id,$quantity+$this->getOrderItemQuantity($order_id,$product_id));
-        $result = mysqli_query($con, "update order_item set item_quantity =item_quantity+$quantity, item_total =$total  where product=$product_id and cust_order=$order_id");
+
+        $pr = product::getProduct($product_id)->product;
+        $quantity = $quantity+$this->getOrderItemQuantity($order_id,$product_id);
+
+        $total = product::calculatePrice($product_id,$quantity);
+        $item_discount = (($pr->unit_price * $quantity) - $total) < 0 ? 0: (($pr->unit_price * $quantity) - $total);
+
+        $result = mysqli_query($con, "update order_item set item_quantity =$quantity, item_total =$total,item_discount=$item_discount  where product=$product_id and cust_order=$order_id");
         mysqli_close($con);
         if (!$result)
             return false;
@@ -84,6 +90,7 @@ class order
                 'order_id' => $row['cust_order'],
                 'quantity' => $row['item_quantity'],
                 'item_total' => $row['item_total'],
+                'item_discount' => $row['item_discount'],
                 'product' => product::getProduct($row['product'])->product);
             $items[] = $item;
         }
@@ -104,6 +111,7 @@ class order
         $item->order_id = $row["cust_order"];
         $item->quantity = $row["item_quantity"];
         $item->item_total = $row["item_total"];
+        $item->item_discount = $row["item_discount"];
         $item->product = product::getProduct($product_id);
         $res->item = $item;
         return $res;
@@ -222,10 +230,11 @@ class order
         }
         else{
             $total = product::calculatePrice($product_id,$quantity);
+            $item_discount = (($pr->unit_price * $quantity) - $total) < 0 ? 0: (($pr->unit_price * $quantity) - $total);
 
             // compute points and add discount
             $con = mysqli_connect('localhost', 'root', '', 'supermarket');
-            $query = "insert into order_item (cust_order, product, item_quantity ,item_total) values ($order_id,$product_id,$quantity,$total) ";
+            $query = "insert into order_item (cust_order, product, item_quantity ,item_total,item_discount) values ($order_id,$product_id,$quantity,$total,$item_discount) ";
             $result = mysqli_query($con, $query);
             mysqli_close($con);
             if (!$result)
@@ -367,12 +376,14 @@ class order
             purchaseorder::autoPurchaseOrder($item["product"]->id);
 
 
-        $responce = new stdClass();
-        $responce->code = "200";
-        $responce->message = "order placed";
-        $res = new stdClass();
-        $res->responce = $responce;
-        return $res;
+        return order::getOrder($order_id);
+
+//        $responce = new stdClass();
+//        $responce->code = "200";
+//        $responce->message = "order placed";
+//        $res = new stdClass();
+//        $res->responce = $responce;
+//        return $res;
 
     }
 }
