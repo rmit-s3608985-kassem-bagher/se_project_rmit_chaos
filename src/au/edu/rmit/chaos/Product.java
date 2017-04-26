@@ -293,4 +293,16 @@ public class Product {
 	discounts.add(dc);
 	return true;
     }
+    
+    @Override
+    public boolean equals(Object o){
+	boolean equals = false;
+        if (o instanceof Product){
+            Product pr = (Product) o;
+            equals = pr.getID() == this.id;
+        }
+     return equals;
+    }
+    
+    
 }

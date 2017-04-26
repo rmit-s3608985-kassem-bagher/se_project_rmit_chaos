@@ -2,19 +2,20 @@ package au.edu.rmit.chaos;
 
 import java.util.*;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.google.gson.Gson;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
-class Order {
+public class Order {
     private int id = 0;
     private long date = 0;
     private double total = 0; // after applying discount
     private double subtotal = 0; // before discount
+    private double discount = 0; // total discount
     private double pointsDiscount = 0; // customer's points discount
     private Customer customer = null;
     private ArrayList<OrderItem> orderItems = new ArrayList<OrderItem>();
@@ -33,26 +34,28 @@ class Order {
 	this.id = json.getJSONObject("responce").getInt("order_id");
     }
 
+    public ArrayList<OrderItem> getOrderItems() {
+	return orderItems;
+    }
+
+    public double getTotal() {
+	return total;
+    }
+
+    public double getSubtotal() {
+	return subtotal;
+    }
+
+    public double getPointsDiscount() {
+	return pointsDiscount;
+    }
+
     public int getID() {
 	return id;
     }
 
     public long getDate() {
 	return date;
-    }
-
-    /**
-     * @deprecated not used anuymore
-     */
-    private void computeTotal() {
-	this.subtotal = 0;
-	// calculate subtotal
-	for (int i = 0; i < this.orderItems.size(); i++)
-	    this.subtotal += this.orderItems.get(i).getPrice();
-	// calculate points discount
-	this.pointsDiscount = this.customer.getPointsDiscount(this.subtotal);
-	// calculate total
-	this.total = this.subtotal - this.pointsDiscount;
     }
 
     public boolean addProduct(Product pr, int qty) {
@@ -83,68 +86,26 @@ class Order {
 	}
 
 	// TODO: update item info if exists (parse response from API)
-	OrderItem item = new OrderItem(pr, qty);
-	this.orderItems.add(item);
+	boolean productExist = false;
+	for (OrderItem item : orderItems) {
+	    if (item.getProduct().equals(pr))
+		productExist = true;
+	}
+	if (!productExist) {
+	    OrderItem item = new OrderItem(pr, qty);
+	    this.orderItems.add(item);
+	}
 	return true;
     }
 
     public boolean removeProduct(OrderItem item) {
 	HttpResponse<JsonNode> request = null;
 	try {
-		request = Unirest
-			.post("http://localhost/supermarket/api.php/order/{id}/remove_item")
-			.header("accept", "application/json")
-			.header("Content-Type", "application/json")
-			.routeParam("id", Integer.toString(this.getID()))
-			.queryString("key", "519428fdced64894bb10cd90bd87167c")
-			.queryString("product_id", Integer.toString(item.product.getID()))
-			.asJson();
-	} catch (UnirestException e) {
-		e.printStackTrace();
-		return false;
-	}
-	// retrieve the parsed JSONObject from the response
-	JSONObject json = request.getBody().getObject();
-	if (json.has("error")) {
-		System.err.println(json.getJSONObject("error").getString("message"));
-		return false;
-	}
-	return true;
-    }
-
-    public boolean cancelOrder() {
-	HttpResponse<JsonNode> request = null;
-	try {
-		request = Unirest
-			.post("http://localhost/supermarket/api.php/order/{id}/cancel")
-			.header("accept", "application/json")
-			.header("Content-Type", "application/json")
-			.routeParam("id", Integer.toString(this.getID()))
-			.queryString("key", "519428fdced64894bb10cd90bd87167c")
-			.asJson();
-	} catch (UnirestException e) {
-		e.printStackTrace();
-		return false;
-	}
-	// retrieve the parsed JSONObject from the response
-	JSONObject json = request.getBody().getObject();
-	if (json.has("error")) {
-		System.err.println(json.getJSONObject("error").getString("message"));
-		return false;
-	}
-	return false;
-    }
-
-    public boolean placeOrder() {
-	HttpResponse<JsonNode> request = null;
-	try {
-	    request = Unirest.post("http://localhost/supermarket/api.php/order/{id}/place")
-		    .header("accept", "application/json")
+	    request = Unirest.post("http://localhost/supermarket/api.php/order/{id}/remove_item")
+		    .header("accept", "application/json").header("Content-Type", "application/json")
 		    .routeParam("id", Integer.toString(this.getID()))
-		    .header("Content-Type", "application/json")
 		    .queryString("key", "519428fdced64894bb10cd90bd87167c")
-		    .queryString("customer_id",this.customer.getId())
-		    .asJson();
+		    .queryString("product_id", Integer.toString(item.product.getID())).asJson();
 	} catch (UnirestException e) {
 	    e.printStackTrace();
 	    return false;
@@ -156,6 +117,74 @@ class Order {
 	    return false;
 	}
 	return true;
+    }
+
+    public boolean cancelOrder() {
+	HttpResponse<JsonNode> request = null;
+	try {
+	    request = Unirest.post("http://localhost/supermarket/api.php/order/{id}/cancel")
+		    .header("accept", "application/json").header("Content-Type", "application/json")
+		    .routeParam("id", Integer.toString(this.getID()))
+		    .queryString("key", "519428fdced64894bb10cd90bd87167c").asJson();
+	} catch (UnirestException e) {
+	    e.printStackTrace();
+	    return false;
+	}
+	// retrieve the parsed JSONObject from the response
+	JSONObject json = request.getBody().getObject();
+	if (json.has("error")) {
+	    System.err.println(json.getJSONObject("error").getString("message"));
+	    return false;
+	}
+	return false;
+    }
+
+    public boolean placeOrder() {
+	HttpResponse<JsonNode> request = null;
+	try {
+	    request = Unirest.post("http://localhost/supermarket/api.php/order/{id}/place")
+		    .header("accept", "application/json").routeParam("id", Integer.toString(this.getID()))
+		    .header("Content-Type", "application/json").queryString("key", "519428fdced64894bb10cd90bd87167c")
+		    .queryString("customer_id", this.customer.getId()).asJson();
+	} catch (UnirestException e) {
+	    e.printStackTrace();
+	    return false;
+	}
+	// retrieve the parsed JSONObject from the response
+	JSONObject json = request.getBody().getObject();
+	if (json.has("error")) {
+	    System.out.println("\t" + json.getJSONObject("error").getString("message"));
+	    return false;
+	}
+
+	this.subtotal = json.getJSONObject("order").getDouble("subtotal");
+	this.total = json.getJSONObject("order").getDouble("total");
+	this.pointsDiscount = json.getJSONObject("order").getDouble("discount");
+	this.status = OrderStatus.valueOf(json.getJSONObject("order").getString("status"));
+
+	JSONArray items = json.getJSONObject("order").getJSONArray("items");
+
+	// update total for each item
+	for (OrderItem item : orderItems) {
+	    for (int i = 0; i < items.length(); i++) {
+		if (item.product.getID() == items.getJSONObject(i).getJSONObject("product").getInt("id")) {
+		    item.setTotal(items.getJSONObject(i).getDouble("item_total"));
+		    item.setDiscount(items.getJSONObject(i).getDouble("item_discount"));
+		    this.discount += item.getDiscount();
+		    item.quantity = items.getJSONObject(i).getInt("quantity");
+		}
+	    }
+	}
+
+	return true;
+    }
+
+    public double getDiscount() {
+	return discount;
+    }
+
+    public void setDiscount(double discount) {
+	this.discount = discount;
     }
 
 }

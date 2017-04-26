@@ -20,9 +20,7 @@ public class Customer {
 	this.username = username;
 	this.password = password;
 	if (login(username, password)) {
-	    System.out.println("Customer Created and logged in");
-	} else {
-	    System.err.println("Customer Created but could not login!\nYou need to call the login function");
+	    System.out.println("\tWelcome "+this.getName()+", You are now logged in!");
 	}
 
     }
@@ -42,7 +40,7 @@ public class Customer {
 	// retrieve the parsed JSONObject from the response
 	JSONObject json = request.getBody().getObject();
 	if (json.has("error")) {
-	    System.err.println(json.getJSONObject("error").getString("message"));
+	    System.out.println("\t"+json.getJSONObject("error").getString("message"));
 	    return false;
 	}
 

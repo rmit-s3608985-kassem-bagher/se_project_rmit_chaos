@@ -1,9 +1,7 @@
 package au.edu.rmit.chaos;
 
-import java.awt.Menu;
+import java.io.IOException;
 import java.util.*;
-
-import javax.swing.plaf.MenuItemUI;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -13,7 +11,16 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
+import au.edu.rmit.chaos.menu.CustomerMenu;
+import au.edu.rmit.chaos.menu.LoginMenu;
+
 public class Company {
+
+    public Customer customer;
+    public Employee employee;
+    private CustomerMenu cuMenu;
+    final static String operatingSystem = System.getProperty("os.name");
+
     // private ArrayList<Order> orders = new ArrayList<Order>();
     // private ArrayList<Customer> custs = new ArrayList<Customer>();
     // private ArrayList<Product> prods = new ArrayList<Product>();
@@ -56,31 +63,35 @@ public class Company {
     // }
     //
     //
-
-
-    public static char menu() {
+    
+    public static char displayMainMenu() {
 	System.out.println("\n\n\t\tSupermarket Support System\n");
-	System.out.println("\tCustomer			0");
-	System.out.println("\tSales Staff			1");
-	System.out.println("\tWarehouse Staff			2");
-	System.out.println("\tManager				3");
-	System.out.println("\tExit				4");
-	System.out.println("\n\t*********************************");
+	System.out.println("\tCustomer				0");
+	System.out.println("\tEmployee				1");
+	System.out.println("\tExit					3");
+	System.out.println("\n\t*****************************************");
 	System.out.print("\tYour choice : ");
 	scan = new Scanner(System.in);
 	char ch = scan.nextLine().charAt(0);
 	return ch;
     }
 
-    //
     public static void main(String args[]) {
-	// Customer cu = new Customer("kassem", "kassem123");
-	// Employee emp = new Employee("tim", "tim");
-	
+	Company comp = new Company();
 	char c;
 	do {
-	    c =menu();
-	} while (c != '4');
+	    c = displayMainMenu();
+
+	    if (c == '0') { // customer menu
+		comp.customer = LoginMenu.displayCustomerLogin();
+		if (comp.customer.isLoggedIn()) {
+		    comp.cuMenu = new CustomerMenu(comp.customer);
+		    comp.cuMenu.display();
+		}
+	    } else if (c == '1') { // employee menu
+		comp.employee = LoginMenu.displayEmployeeLogin();
+	    }
+	} while (c != '3');
 
 	// Product.fetchProductsFromServer();
 	// ArrayList<Supplier> sup = Supplier.fetchSuppliersFromServer();

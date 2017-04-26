@@ -2,27 +2,27 @@ package au.edu.rmit.chaos;
 
 public class OrderItem extends Item {
     private double total;
+    private double discount;
+
+    public double getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(double discount) {
+        this.discount = discount;
+    }
 
     public OrderItem(Product p, int qty) {
 	super(qty, p);
     }
 
-    @Override
-    public double getPrice() {
-	double val = super.getPrice() - getBulkPrice();
-	this.total = val;
-	return val;
+    public double getTotal() {
+	return total;
     }
 
-    private double getBulkPrice() {
-	double bulkPrice = 0;
-	for (Discount disc : this.product.getDiscounts()) {
-	    if (quantity >= disc.getQuantity()) { // discount applies
-		double tmp = (this.product.getUnitPrice() * disc.getQuantity()) * (disc.getPercentage() / 100);
-		System.out.println(tmp);
-		bulkPrice = bulkPrice > tmp ? bulkPrice : tmp;
-	    }
-	}
-	return bulkPrice;
+    public void setTotal(double total) {
+	this.total = total;
     }
+    
+    
 }

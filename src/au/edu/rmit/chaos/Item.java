@@ -4,16 +4,17 @@ public class Item {
     protected int quantity;
     protected Product product;
     
+    
     public Item(int quantity, Product product) {
 	this.quantity = quantity;
 	this.product = product;
     }
     
-    protected Product getProduct() {
+    public Product getProduct() {
 	return product;
     }
 
-    protected double getQuantity() {
+    public double getQuantity() {
 	return quantity;
     }
     
@@ -21,5 +22,5 @@ public class Item {
 	double val = (this.product.getProductPrice() * this.quantity);
 	return val;
     }
-
+    
 }

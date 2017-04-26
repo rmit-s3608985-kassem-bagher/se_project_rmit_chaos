@@ -15,11 +15,9 @@ public class Employee {
     private EmployeeRole role;
     boolean loggedIn = false;
 
-    Employee(String username, String password) {
+   public Employee(String username, String password) {
 	if (login(username, password)) {
-	    System.out.println("Employee Created and logged in");
-	} else {
-	    System.err.println("Employee Created but could not login!\nYou need to call the login function");
+	    System.out.println("\tWelcome "+this.getName()+", You are now logged in!");
 	}
     }
 
@@ -38,10 +36,10 @@ public class Employee {
 	// retrieve the parsed JSONObject from the response
 	JSONObject json = request.getBody().getObject();
 	if (json.has("error")) {
-	    System.err.println(json.getJSONObject("error").getString("message"));
+	    System.out.println("\t"+json.getJSONObject("error").getString("message"));
 	    return false;
 	}
-	this.id = json.getInt("id");
+	this.setID(json.getInt("id"));
 	this.name = json.getString("name");
 	this.role = EmployeeRole.valueOf(json.getString("role"));
 	this.loggedIn = true;
@@ -62,6 +60,22 @@ public class Employee {
 
     public String getName() {
 	return name;
+    }
+
+    public int getID() {
+	return id;
+    }
+
+    public void setID(int id) {
+	this.id = id;
+    }
+
+    public String getUsername() {
+	return username;
+    }
+
+    public String getPassword() {
+	return password;
     }
 
 }
