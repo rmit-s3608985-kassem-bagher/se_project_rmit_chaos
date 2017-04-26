@@ -2,9 +2,7 @@ package au.edu.rmit.chaos.menu;
 
 import java.util.ArrayList;
 import java.util.Scanner;
-
 import com.mashape.unirest.http.exceptions.UnirestException;
-
 import au.edu.rmit.chaos.*;
 
 public class CustomerMenu {
@@ -23,15 +21,17 @@ public class CustomerMenu {
 	System.out.printf("\t" + "%-40s %-10s %-10s %-10s %n", "Order (#" + order.getID() + ")", "qty", "unit price",
 		"total");
 	for (OrderItem item : order.getOrderItems()) {
-	    System.out.printf("\t" + "%-40s %-10s %-10s %-10s %n", item.getProduct().getName(), item.getQuantity(),
+	    System.out.printf("\t" + "%-40s %-10s $%-10s $%-10s %n", item.getProduct().getName(), item.getQuantity(),
 		    item.getProduct().getUnitPrice(), item.getTotal());
 	}
 	System.out.println("\t--------------------------------------------------------------");
-	System.out.printf("\t" + "%-40s %-10s %-10s %-10s %n", "Subtotal", " ", " ", order.getSubtotal()+order.getDiscount());
-	System.out.printf("\t" + "%-40s %-10s %-10s %-10s %n", "Discount", " ", " ", order.getPointsDiscount()+order.getDiscount());
-	System.out.printf("\t" + "%-40s %-10s %-10s %-10s %n", "Total", " ", " ", order.getTotal());
+	System.out.printf("\t" + "%-40s %-10s %-10s $%-10s %n", "Subtotal", " ", " ",
+		order.getSubtotal() + order.getDiscount());
+	System.out.printf("\t" + "%-40s %-10s %-10s $%-10s %n", "Discount", " ", " ",
+		order.getPointsDiscount() + order.getDiscount());
+	System.out.printf("\t" + "%-40s %-10s %-10s $%-10s %n", "Total", " ", " ", order.getTotal());
 
-	System.out.println("\n\tPress return to go back to main menu...");
+	System.out.println("\n\n\tPress return to go back to main menu...");
 	scan.nextLine();
     }
 
@@ -52,8 +52,62 @@ public class CustomerMenu {
 	return qty;
     }
 
-    private void checkProductPriceMenu() {
+    private void checkApplicableDiscunts() {
+	products = Product.fetchProductsFromServer();
+	boolean discountsAvailable = false;
 
+	System.out.println("\n\n\t\t\tAvailable Discounts");
+	System.out.printf("\t" + "%-30s %-10s %s %n", "Product", "qty", "percentage");
+
+	// loop through products
+	for (int x = 0; x < products.size(); x++) {
+	    // loop through discounts
+	    Product pr = products.get(x);
+	    for (Discount disc : pr.getDiscounts()) {
+		System.out.printf("\t" + "%-30s %-10s %s%% %n", pr.getName(), disc.getQuantity(), disc.getPercentage());
+		discountsAvailable = true;
+	    }
+	}
+	if(!discountsAvailable){
+	    System.out.println("\n\t\tNo Available Disounts\n");
+	}
+	
+	System.out.println("\n\tPress return to go back...");
+	scan.nextLine();
+    }
+
+    private void checkProductPriceMenu() {
+	products = Product.fetchProductsFromServer();
+	do {
+	    char ch;
+	    System.out.println("\n\n\t\tAvailable Products");
+	    for (int x = 0; x < products.size(); x++) {
+		System.out.printf("\t" + "%-40s %d %n", products.get(x).getName(), x);
+	    }
+	    System.out.printf("\t" + "%-40s %d %n", "Back to main menu", products.size());
+	    System.out.println("\n\t" + String.format("%40s", "*").replace(' ', '*'));
+	    System.out.print("\tYour choice : ");
+
+	    try {
+		ch = scan.nextLine().charAt(0);
+	    } catch (Exception e) {
+		continue;
+	    }
+
+	    // exit selected
+	    if (ch == Integer.toString(products.size()).charAt(0)) {
+		break;
+	    }
+
+	    // unknown selection
+	    if (Character.getNumericValue(ch) > products.size()) {
+		continue;
+	    }
+	    Product pr = products.get(Character.getNumericValue(ch));
+	    System.out.printf("%n\t1 %s of %s costs $%.2f", pr.getType().toString(), pr.getName(), pr.getUnitPrice());
+	    System.out.println("\n\tPress return to go back...");
+	    scan.nextLine();
+	} while (true);
     }
 
     private void placeOrderMenu() {
@@ -99,7 +153,7 @@ public class CustomerMenu {
 	    // more products
 	    if (ch == 'n') {
 		while (!this.order.placeOrder()) {
-		    System.out.println("\tReference order #"+order.getID()+" to the sales staff.");
+		    System.out.println("\tReference order #" + order.getID() + " to the sales staff.");
 		    System.out.println("\tPlease wait for sales staff assistant 🙁!");
 		    scan.nextLine();
 		}
@@ -125,11 +179,15 @@ public class CustomerMenu {
 	    try {
 		ch = scan.nextLine().charAt(0);
 	    } catch (Exception e) {
-		
+
 	    }
 	    if (ch == '0') {
 		placeOrderMenu();
 		this.order = null;
+	    } else if (ch == '1') {
+		checkProductPriceMenu();
+	    } else if (ch == '3') {
+		checkApplicableDiscunts();
 	    } else if (ch == '4') {
 		System.exit(0);
 	    }
