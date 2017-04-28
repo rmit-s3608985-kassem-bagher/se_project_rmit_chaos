@@ -16,8 +16,16 @@ public class CustomerMenu {
 	scan = new Scanner(System.in);
     }
 
-    private void printInvoic() {
-	System.out.println("\n\n\tOrder Placed Successfully 😃✌️!\n");
+    private void printInvoic(OrderStatus status) {
+	if(status == OrderStatus.placed || status == OrderStatus.already_placed)
+	    System.out.println("\n\n\tOrder Placed Successfully 😃✌️!\n");
+	else if (status == OrderStatus.canceled || status == OrderStatus.already_canceled) {
+	    System.out.println("\n\n\tOrder has been canceled️!\n");
+	    System.out.println("\n\n\tPress return to go back to main menu...");
+	    scan.nextLine();
+	    return;
+	}
+	
 	System.out.printf("\t" + "%-40s %-10s %-10s %-10s %n", "Order (#" + order.getID() + ")", "qty", "unit price",
 		"total");
 	for (OrderItem item : order.getOrderItems()) {
@@ -119,6 +127,7 @@ public class CustomerMenu {
 	    loadProducts();
 	    try {
 		order = new Order(customer);
+		order.createNewOrder();
 	    } catch (UnirestException e) {
 		e.printStackTrace();
 	    }
@@ -133,17 +142,19 @@ public class CustomerMenu {
 
 	    System.out.println("\n\t" + String.format("%40s", "*").replace(' ', '*'));
 	    System.out.print("\tYour choice : ");
+	    int item;
 	    try {
-		ch = scan.nextLine().charAt(0);
+		item = scan.nextInt();
+		scan.nextLine();
 	    } catch (Exception e) {
 		continue;
 	    }
 	    // specify quantity
-	    int qty = productQuantity(products.get(Character.getNumericValue(ch)));
+	    int qty = productQuantity(products.get(item));
 	    if (qty == 0) {
 		continue;
 	    }
-	    this.order.addProduct(products.get(Character.getNumericValue(ch)), qty);
+	    this.order.addProduct(products.get(item), qty);
 
 	    do {
 		System.out.print("\tDo you want to add more products? Y/N: ");
@@ -152,12 +163,16 @@ public class CustomerMenu {
 
 	    // more products
 	    if (ch == 'n') {
-		while (!this.order.placeOrder()) {
+		OrderStatus status = this.order.placeOrder(); 
+		while (status == OrderStatus.pending || status == OrderStatus.insufficient_balance
+			|| status == OrderStatus.unknown) {
+		    System.out.println("\n\tInsufficient balance");
 		    System.out.println("\tReference order #" + order.getID() + " to the sales staff.");
 		    System.out.println("\tPlease wait for sales staff assistant 🙁!");
 		    scan.nextLine();
+		    status = this.order.placeOrder();
 		}
-		printInvoic();
+		printInvoic(status);
 		break;
 	    }
 	} while (true);
@@ -193,6 +208,5 @@ public class CustomerMenu {
 	    }
 
 	} while (true);
-
     }
 }

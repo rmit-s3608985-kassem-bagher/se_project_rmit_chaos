@@ -13,12 +13,14 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 
 import au.edu.rmit.chaos.menu.CustomerMenu;
 import au.edu.rmit.chaos.menu.LoginMenu;
+import au.edu.rmit.chaos.menu.SalesStaffMenu;
 
 public class Company {
 
     public Customer customer;
     public Employee employee;
     private CustomerMenu cuMenu;
+    private SalesStaffMenu sMenu;
     final static String operatingSystem = System.getProperty("os.name");
 
     // private ArrayList<Order> orders = new ArrayList<Order>();
@@ -63,7 +65,7 @@ public class Company {
     // }
     //
     //
-    
+
     public static char displayMainMenu() {
 	System.out.println("\n\n\t\tSupermarket Support System\n");
 	System.out.println("\tCustomer				0");
@@ -90,6 +92,12 @@ public class Company {
 		}
 	    } else if (c == '1') { // employee menu
 		comp.employee = LoginMenu.displayEmployeeLogin();
+		if (comp.employee.isLoggedIn()) {
+		    if (comp.employee.getRole() == EmployeeRole.sales) {
+			comp.sMenu = new SalesStaffMenu(comp.employee);
+			comp.sMenu.display();
+		    }
+		}
 	    }
 	} while (c != '3');
 

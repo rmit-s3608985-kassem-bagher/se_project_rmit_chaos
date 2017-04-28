@@ -80,6 +80,18 @@ class order
         return true;
     }
 
+    private function isOrderExists($order_id){
+        $con = mysqli_connect('localhost', 'root', '', 'supermarket');
+        $con->set_charset("utf8");
+        $result = mysqli_query($con, "select * from customer_order WHERE order_id= $order_id");
+        $row = $result->fetch_assoc();
+        mysqli_close($con);
+        if ($row == null)
+            return false;
+        return true;
+    }
+
+
     private function getOrderItems($order_id){
         $con = mysqli_connect('localhost', 'root', '', 'supermarket');
         $con->set_charset("utf8");
@@ -140,6 +152,10 @@ class order
      * @param $order_id
      */
     public function cancelOrder($order_id){
+
+        if(!order::isOrderExists($order_id))
+            throw new RestException(400,"order does not exist");
+
         $order = order::getOrder($order_id);
         if($order ->order->status == 'canceled')
             throw new RestException(400,"order is already canceled");
@@ -214,6 +230,7 @@ class order
     public function addOrderItemRecord($order_id,$product_id, $quantity)
     {
         $ord = order::getOrder($order_id);
+
         if($ord->order->status == 'canceled')
             throw new RestException(400,"order status is canceled");
 
@@ -252,6 +269,10 @@ class order
      * @param $order_id
      */
     public function getOrder($order_id){
+
+        if(!order::isOrderExists($order_id))
+            throw new RestException(400,"order does not exist");
+
         $con = mysqli_connect('localhost', 'root', '', 'supermarket');
         $con->set_charset("utf8");
         $result = mysqli_query($con, "select * from customer_order where order_id = $order_id");
@@ -269,6 +290,7 @@ class order
         $order->discount = $row["order_discount"];
         $order->points = $row["order_points"];
         $order->bonus_points = $row["bonus_points"];
+        $order->customer = customer::getCustomerById($row["customer"]);
         $order->items = order::getOrderItems($order_id);
         $res->order = $order;
         return $res;

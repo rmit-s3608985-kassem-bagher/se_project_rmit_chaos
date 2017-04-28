@@ -19,7 +19,12 @@ class customer
         return $cust;
     }
 
-    private function getCustomerById($customer_id)
+    /**
+     * @access private
+     * @param $customer_id
+     * @return stdClass
+     */
+    public function getCustomerById($customer_id)
     {
         $con = mysqli_connect('localhost', 'root', '', 'supermarket');
         $con->set_charset("utf8");

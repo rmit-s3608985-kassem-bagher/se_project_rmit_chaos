@@ -69,17 +69,27 @@ public class Customer {
     }
 
     public void increaseBalance(double amount) {
-	this.balance += amount;
-    }
-
-    /**
-     * @deprecated deducted on API
-     * @param amount
-     * @return
-     */
-    public boolean deductBalance(double amount) {
-	this.balance -= amount;
-	return true;
+	HttpResponse<JsonNode> request = null;
+	try {
+	    request = Unirest
+		    .post("http://localhost/supermarket/api.php/customer/{id}/add_balance")
+		    .header("accept", "application/json")
+		    .header("Content-Type", "application/json")
+		    .routeParam("id",Integer.toString(this.id))
+		    .queryString("key", "519428fdced64894bb10cd90bd87167c")
+		    .queryString("amount", amount)
+		    .asJson();
+	} catch (UnirestException e) {
+	    e.printStackTrace();
+	    return;
+	}
+	// retrieve the parsed JSONObject from the response
+	JSONObject json = request.getBody().getObject();
+	if (json.has("error")) {
+	    System.out.println(json.getJSONObject("error").getString("message"));
+	    return;
+	}
+	this.balance = json.getDouble("balance");
     }
 
     public int getPoints() {
