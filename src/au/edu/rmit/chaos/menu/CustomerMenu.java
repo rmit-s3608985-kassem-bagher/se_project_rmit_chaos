@@ -135,7 +135,7 @@ public class CustomerMenu {
 
 	do {
 
-	    System.out.println("\n\n\t\tAvailable Products");
+	    System.out.println("\n\n\t\tAvailable Products (Order #"+order.getID()+")");
 	    for (int x = 0; x < products.size(); x++) {
 		System.out.printf("\t" + "%-40s %d %n", products.get(x).getName(), x);
 	    }

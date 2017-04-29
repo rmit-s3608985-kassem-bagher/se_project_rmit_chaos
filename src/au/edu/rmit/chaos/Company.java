@@ -70,80 +70,79 @@ public class Company {
     //
 
     public static char displayMainMenu() {
-        System.out.println("\n\n\t\tSupermarket Support System\n");
-        System.out.println("\tCustomer				0");
-        System.out.println("\tEmployee				1");
-        System.out.println("\tExit					3");
-        System.out.println("\n\t*****************************************");
-        System.out.print("\tYour choice : ");
-        scan = new Scanner(System.in);
-        char ch = scan.nextLine().charAt(0);
-        return ch;
+	System.out.println("\n\n\t\tSupermarket Support System\n");
+	System.out.println("\tCustomer				0");
+	System.out.println("\tEmployee				1");
+	System.out.println("\tExit					3");
+	System.out.println("\n\t*****************************************");
+	System.out.print("\tYour choice : ");
+	scan = new Scanner(System.in);
+	char ch = scan.nextLine().charAt(0);
+	return ch;
     }
 
     public static void main(String args[]) {
-        Company comp = new Company();
-        char c;
-        do {
-            c = displayMainMenu();
+	Company comp = new Company();
+	char c;
+	do {
+	    c = displayMainMenu();
+	    if (c == '0') { // customer menu
+		comp.customer = LoginMenu.displayCustomerLogin();
+		if (comp.customer.isLoggedIn()) {
+		    comp.cuMenu = new CustomerMenu(comp.customer);
+		    comp.cuMenu.display();
+		}
+	    } else if (c == '1') { // employee menu
+		comp.employee = LoginMenu.displayEmployeeLogin();
+		if (comp.employee.isLoggedIn()) {
+		    if (comp.employee.getRole() == EmployeeRole.sales) {
+			comp.sMenu = new SalesStaffMenu(comp.employee);
+			comp.sMenu.display();
+		    }
+		    else if (comp.employee.getRole() == EmployeeRole.warehouse) {
+			comp.wMenu = new WarehouseMenu(comp.employee);
+			comp.wMenu.display();
+		    }
+		}
+	    }
+	} while (c != '3');
 
-            if (c == '0') { // customer menu
-                comp.customer = LoginMenu.displayCustomerLogin();
-                if (comp.customer.isLoggedIn()) {
-                    comp.cuMenu = new CustomerMenu(comp.customer);
-                    comp.cuMenu.display();
-                }
-            } else if (c == '1') { // employee menu
-                comp.employee = LoginMenu.displayEmployeeLogin();
-                if (comp.employee.isLoggedIn()) {
-                    if (comp.employee.getRole() == EmployeeRole.sales) {
-                        comp.sMenu = new SalesStaffMenu(comp.employee);
-                        comp.sMenu.display();
-                    }
-                    if (comp.employee.getRole() == EmployeeRole.warehouse) {
-                        comp.wMenu = new WarehouseMenu(comp.employee);
-                        comp.wMenu.display();
-                    }
-                }
-            }
-        } while (c != '3');
+	// Product.fetchProductsFromServer();
+	// ArrayList<Supplier> sup = Supplier.fetchSuppliersFromServer();
+	// Customer cu = new Customer("kassem", "kassem123");
+	// Order or=null;
+	// try {
+	// or = new Order(cu);
+	// } catch (UnirestException e) {
+	// e.printStackTrace();
+	// }
+	// or.addProduct(sup.get(0).getSupplierProducts().get(0), 5);
+	// or.addProduct(sup.get(0).getSupplierProducts().get(0), 5);
 
-        // Product.fetchProductsFromServer();
-        // ArrayList<Supplier> sup = Supplier.fetchSuppliersFromServer();
-        // Customer cu = new Customer("kassem", "kassem123");
-        // Order or=null;
-        // try {
-        // or = new Order(cu);
-        // } catch (UnirestException e) {
-        // e.printStackTrace();
-        // }
-        // or.addProduct(sup.get(0).getSupplierProducts().get(0), 5);
-        // or.addProduct(sup.get(0).getSupplierProducts().get(0), 5);
+	// or.placeOrder();
 
-        // or.placeOrder();
-
-        // Discount disc =
-        // sup.get(0).getSupplierProducts().get(0).getDiscounts().get(0);
-        // sup.get(0).getSupplierProducts().get(0).deleteDiscount(disc);
-        // sup.get(0).getSupplierProducts().get(0).addDiscount(100, 100);
-        // sup.get(0).getSupplierProducts().get(0).editUnitPrice(100);
-        // sup.get(0).getSupplierProducts().get(0).deleteDiscount(disc);
-        // sup.get(0).getSupplierProducts().get(0).editDiscount(disc, 1, 2);
-        //// System.out.println(sup.get(0).getSupplierProducts().get(1).getDiscounts().get(1).getPercentage());
-        //// sup.get(0).editSupplier("Alde", "", 0, "");
-        //// System.out.println(sup.get(0).getName());
-        //
-        // Employee emp = new Employee("tim", "tim");
-        //
-        // PurchaseOrder pr = new PurchaseOrder(sup.get(0),emp);
-        // pr.addProduct(sup.get(0).getSupplierProducts().get(0), 20);
-        // pr.addProduct(sup.get(1).getSupplierProducts().get(0), 2);
-        // pr.placeOrder();
-        // ArrayList<Product> prs = Product.fetchProductsFromServer();
-        // Employee emp = new Employee("tim", "tim");
-        // System.out.println(emp.getRole());
-        // Customer cu = new Customer("kassem", "kassem123");
-        // System.out.println(cu.getName());
+	// Discount disc =
+	// sup.get(0).getSupplierProducts().get(0).getDiscounts().get(0);
+	// sup.get(0).getSupplierProducts().get(0).deleteDiscount(disc);
+	// sup.get(0).getSupplierProducts().get(0).addDiscount(100, 100);
+	// sup.get(0).getSupplierProducts().get(0).editUnitPrice(100);
+	// sup.get(0).getSupplierProducts().get(0).deleteDiscount(disc);
+	// sup.get(0).getSupplierProducts().get(0).editDiscount(disc, 1, 2);
+	//// System.out.println(sup.get(0).getSupplierProducts().get(1).getDiscounts().get(1).getPercentage());
+	//// sup.get(0).editSupplier("Alde", "", 0, "");
+	//// System.out.println(sup.get(0).getName());
+	//
+	// Employee emp = new Employee("tim", "tim");
+	//
+	// PurchaseOrder pr = new PurchaseOrder(sup.get(0),emp);
+	// pr.addProduct(sup.get(0).getSupplierProducts().get(0), 20);
+	// pr.addProduct(sup.get(1).getSupplierProducts().get(0), 2);
+	// pr.placeOrder();
+	// ArrayList<Product> prs = Product.fetchProductsFromServer();
+	// Employee emp = new Employee("tim", "tim");
+	// System.out.println(emp.getRole());
+	// Customer cu = new Customer("kassem", "kassem123");
+	// System.out.println(cu.getName());
 
     }
     //

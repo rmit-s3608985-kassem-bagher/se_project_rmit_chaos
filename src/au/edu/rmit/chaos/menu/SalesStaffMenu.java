@@ -115,12 +115,13 @@ public class SalesStaffMenu {
         int option = 0;
 
         do {
-            System.out.println("\n\n\t\t\tWelcome " + employee.getName());
-            System.out.println("\tCancel Order 					0");
-            System.out.println("\tEdit Order					1");
-            System.out.println("\tTopup Customer's card				2");
-            System.out.println("\tExit						3");
-            System.out.println("\n\t*************************************************");
+            
+	    System.out.println("\n\n\t\t\tWelcome " + employee.getName());
+	    System.out.printf("\t %-50s %-2s %n", "Cancel Order", "0");
+	    System.out.printf("\t %-50s %-2s %n", "Edit Order", "1");
+	    System.out.printf("\t %-50s %-2s %n", "Topup Customer's card", "2");
+	    System.out.printf("\t %-50s %-2s %n", "Exit", "3");
+	    System.out.println(String.format("%n\t%-53s%n", " ").replace(" ", "*"));
             System.out.print("\tYour choice : ");
 
             try {
