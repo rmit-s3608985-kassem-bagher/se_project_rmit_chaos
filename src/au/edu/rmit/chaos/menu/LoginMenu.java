@@ -21,7 +21,7 @@ public class LoginMenu {
 	password = scan.nextLine();
 
 	System.out.println("\n\tPlease Wait...");
-	Customer cu = new Customer(username, password);
+	Customer cu = new Customer(username, password,true);
 
 	System.out.println("\n\tPress any key to continue...");
 	scan.nextLine();

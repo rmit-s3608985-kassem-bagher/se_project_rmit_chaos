@@ -74,12 +74,27 @@ class product
         return $price - $bulk_price;
     }
 
+    private function isProductExists($product_id){
+        $con = mysqli_connect('localhost', 'root', '', 'supermarket');
+        $con->set_charset("utf8");
+        $result = mysqli_query($con, "select * from product where prod_id = $product_id");
+        $row = $result->fetch_assoc();
+        mysqli_close($con);
+        if ($row == null)
+            return false;
+        return true;
+    }
+
+
     /**
-     * @access private
+     * @url GET /{product_id}/
      * @param $product_id
      */
     public function getProduct($product_id)
     {
+        if(!product::isProductExists($product_id))
+            throw new RestException(404,"product does not exist");
+
         $con = mysqli_connect('localhost', 'root', '', 'supermarket');
         $con->set_charset("utf8");
         $result = mysqli_query($con, "select * from product where prod_id= $product_id");

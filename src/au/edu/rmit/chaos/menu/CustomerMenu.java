@@ -68,14 +68,13 @@ public class CustomerMenu {
 	System.out.printf("\t" + "%-30s %-10s %s %n", "Product", "qty", "percentage");
 
 	// loop through products
-	for (int x = 0; x < products.size(); x++) {
-	    // loop through discounts
-	    Product pr = products.get(x);
-	    for (Discount disc : pr.getDiscounts()) {
-		System.out.printf("\t" + "%-30s %-10s %s%% %n", pr.getName(), disc.getQuantity(), disc.getPercentage());
-		discountsAvailable = true;
-	    }
-	}
+		for (Product pr : products) {
+			// loop through discounts
+			for (Discount disc : pr.getDiscounts()) {
+				System.out.printf("\t" + "%-30s %-10s %s%% %n", pr.getName(), disc.getQuantity(), disc.getPercentage());
+				discountsAvailable = true;
+			}
+		}
 	if(!discountsAvailable){
 	    System.out.println("\n\t\tNo Available Disounts\n");
 	}
@@ -87,7 +86,7 @@ public class CustomerMenu {
     private void checkProductPriceMenu() {
 	products = Product.fetchProductsFromServer();
 	do {
-	    char ch;
+	    int option;
 	    System.out.println("\n\n\t\tAvailable Products");
 	    for (int x = 0; x < products.size(); x++) {
 		System.out.printf("\t" + "%-40s %d %n", products.get(x).getName(), x);
@@ -97,21 +96,22 @@ public class CustomerMenu {
 	    System.out.print("\tYour choice : ");
 
 	    try {
-		ch = scan.nextLine().charAt(0);
+		option = scan.nextInt();
+		scan.nextLine();
 	    } catch (Exception e) {
 		continue;
 	    }
 
 	    // exit selected
-	    if (ch == Integer.toString(products.size()).charAt(0)) {
+	    if (option == products.size()) {
 		break;
 	    }
 
 	    // unknown selection
-	    if (Character.getNumericValue(ch) > products.size()) {
+	    if (option > products.size()) {
 		continue;
 	    }
-	    Product pr = products.get(Character.getNumericValue(ch));
+	    Product pr = products.get(option);
 	    System.out.printf("%n\t1 %s of %s costs $%.2f", pr.getType().toString(), pr.getName(), pr.getUnitPrice());
 	    System.out.println("\n\tPress return to go back...");
 	    scan.nextLine();
@@ -119,7 +119,7 @@ public class CustomerMenu {
     }
 
     private void placeOrderMenu() {
-	char ch;
+	int moreProducts;
 
 	// new order
 	if (order == null) {
@@ -158,11 +158,11 @@ public class CustomerMenu {
 
 	    do {
 		System.out.print("\tDo you want to add more products? Y/N: ");
-		ch = scan.nextLine().toLowerCase().trim().charAt(0);
-	    } while (ch != 'y' && ch != 'n');
+		moreProducts = scan.nextLine().toLowerCase().trim().charAt(0);
+	    } while (moreProducts != 'y' && moreProducts != 'n');
 
 	    // more products
-	    if (ch == 'n') {
+	    if (moreProducts == 'n') {
 		OrderStatus status = this.order.placeOrder(); 
 		while (status == OrderStatus.pending || status == OrderStatus.insufficient_balance
 			|| status == OrderStatus.unknown) {
@@ -180,7 +180,7 @@ public class CustomerMenu {
     }
 
     public void display() {
-	char ch = 0;
+	int option = 0;
 
 	do {
 	    System.out.println("\n\n\t\t\tWelcome " + customer.getName());
@@ -192,18 +192,18 @@ public class CustomerMenu {
 	    System.out.print("\tYour choice : ");
 
 	    try {
-		ch = scan.nextLine().charAt(0);
-	    } catch (Exception e) {
-
+		option = scan.nextInt();
+		scan.nextLine();
+	    } catch (Exception ignored) {
 	    }
-	    if (ch == '0') {
+	    if (option == 0) {
 		placeOrderMenu();
 		this.order = null;
-	    } else if (ch == '1') {
+	    } else if (option == 1) {
 		checkProductPriceMenu();
-	    } else if (ch == '3') {
+	    } else if (option == 3) {
 		checkApplicableDiscunts();
-	    } else if (ch == '4') {
+	    } else if (option == 4) {
 		System.exit(0);
 	    }
 
