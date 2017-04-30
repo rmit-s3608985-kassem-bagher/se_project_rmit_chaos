@@ -5,7 +5,7 @@ import java.util.Scanner;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import au.edu.rmit.chaos.*;
 
-public class CustomerMenu {
+public class CustomerMenu extends Menu{
     private Customer customer;
     private Scanner scan;
     private ArrayList<Product> products;
@@ -17,7 +17,7 @@ public class CustomerMenu {
     }
 
     private void printInvoic(OrderStatus status) {
-	if(status == OrderStatus.placed || status == OrderStatus.already_placed)
+	if (status == OrderStatus.placed || status == OrderStatus.already_placed)
 	    System.out.println("\n\n\tOrder Placed Successfully 😃✌️!\n");
 	else if (status == OrderStatus.canceled || status == OrderStatus.already_canceled) {
 	    System.out.println("\n\n\tOrder has been canceled️!\n");
@@ -25,7 +25,7 @@ public class CustomerMenu {
 	    scan.nextLine();
 	    return;
 	}
-	
+
 	System.out.printf("\t" + "%-40s %-10s %-10s %-10s %n", "Order (#" + order.getID() + ")", "qty", "unit price",
 		"total");
 	for (OrderItem item : order.getOrderItems()) {
@@ -47,74 +47,27 @@ public class CustomerMenu {
 	products = Product.fetchProductsFromServer();
     }
 
-    private int productQuantity(Product pr) {
-	int qty;
-	System.out.print("\tEnter quantity for " + pr.getName() + ": ");
-	try {
-	    qty = scan.nextInt();
-	    scan.nextLine();
-	} catch (Exception e) {
-	    System.out.println("\tPlease enter a valid quantity 😒");
-	    return 0;
-	}
-	return qty;
-    }
-
     private void checkApplicableDiscunts() {
 	products = Product.fetchProductsFromServer();
-	boolean discountsAvailable = false;
-
-	System.out.println("\n\n\t\t\tAvailable Discounts");
-	System.out.printf("\t" + "%-30s %-10s %s %n", "Product", "qty", "percentage");
-
-	// loop through products
-		for (Product pr : products) {
-			// loop through discounts
-			for (Discount disc : pr.getDiscounts()) {
-				System.out.printf("\t" + "%-30s %-10s %s%% %n", pr.getName(), disc.getQuantity(), disc.getPercentage());
-				discountsAvailable = true;
-			}
-		}
-	if(!discountsAvailable){
-	    System.out.println("\n\t\tNo Available Disounts\n");
-	}
-	
-	System.out.println("\n\tPress return to go back...");
-	scan.nextLine();
+	displayDiscount(products);
+	pressToContinue();
     }
 
     private void checkProductPriceMenu() {
 	products = Product.fetchProductsFromServer();
 	do {
-	    int option;
-	    System.out.println("\n\n\t\tAvailable Products");
-	    for (int x = 0; x < products.size(); x++) {
-		System.out.printf("\t" + "%-40s %d %n", products.get(x).getName(), x);
-	    }
-	    System.out.printf("\t" + "%-40s %d %n", "Back to main menu", products.size());
-	    System.out.println("\n\t" + String.format("%40s", "*").replace(' ', '*'));
-	    System.out.print("\tYour choice : ");
-
-	    try {
-		option = scan.nextInt();
-		scan.nextLine();
-	    } catch (Exception e) {
-		continue;
-	    }
-
-	    // exit selected
-	    if (option == products.size()) {
+	    int option = displayProductsInput(products, "Available Products",true);
+	    if(option == products.size())
 		break;
-	    }
-
-	    // unknown selection
-	    if (option > products.size()) {
+	    else if(option == -1){
+		invalidOptionMessage();
+		pressToContinue();
 		continue;
 	    }
+		
 	    Product pr = products.get(option);
 	    System.out.printf("%n\t1 %s of %s costs $%.2f", pr.getType().toString(), pr.getName(), pr.getUnitPrice());
-	    System.out.println("\n\tPress return to go back...");
-	    scan.nextLine();
+	    pressToContinue();
 	} while (true);
     }
 
@@ -134,26 +87,23 @@ public class CustomerMenu {
 	}
 
 	do {
-
-	    System.out.println("\n\n\t\tAvailable Products (Order #"+order.getID()+")");
-	    for (int x = 0; x < products.size(); x++) {
-		System.out.printf("\t" + "%-40s %d %n", products.get(x).getName(), x);
-	    }
-
-	    System.out.println("\n\t" + String.format("%40s", "*").replace(' ', '*'));
-	    System.out.print("\tYour choice : ");
-	    int item;
-	    try {
-		item = scan.nextInt();
-		scan.nextLine();
-	    } catch (Exception e) {
+	    String title = "Available Products (Order #" + order.getID() + ")";
+	    int item = displayProductsInput(products, title,false);
+	    
+	    if (item == -1) {
+		invalidOptionMessage();
+		pressToContinue();
 		continue;
 	    }
-	    // specify quantity
-	    int qty = productQuantity(products.get(item));
+	    
+	    Product pr = products.get(item);
+	    title = "Enter quantity for " + pr.getName();
+	    int qty = displayIntegerInputMessage(title);
+	    
 	    if (qty == 0) {
 		continue;
 	    }
+	    
 	    this.order.addProduct(products.get(item), qty);
 
 	    do {
@@ -163,7 +113,7 @@ public class CustomerMenu {
 
 	    // more products
 	    if (moreProducts == 'n') {
-		OrderStatus status = this.order.placeOrder(); 
+		OrderStatus status = this.order.placeOrder();
 		while (status == OrderStatus.pending || status == OrderStatus.insufficient_balance
 			|| status == OrderStatus.unknown) {
 		    System.out.println("\n\tInsufficient balance");

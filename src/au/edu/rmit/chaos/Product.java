@@ -108,7 +108,7 @@ public class Product {
         // retrieve the parsed JSONObject from the response
         JSONObject json = request.getBody().getObject();
         if (json.has("error")) {
-            System.err.println(json.getJSONObject("error").getString("message"));
+            System.err.println("\t"+json.getJSONObject("error").getString("message"));
             return false;
         }
         if (json.getJSONObject("product") == null) {
