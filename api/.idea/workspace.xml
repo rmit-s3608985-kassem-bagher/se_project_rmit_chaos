@@ -79,8 +79,8 @@
       <file leaf-file-name="product.php" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/product.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="416">
-              <caret line="95" column="39" lean-forward="false" selection-start-line="95" selection-start-column="39" selection-end-line="95" selection-end-column="39" />
+            <state relative-caret-position="371">
+              <caret line="92" column="43" lean-forward="true" selection-start-line="92" selection-start-column="43" selection-end-line="92" selection-end-column="43" />
               <folding>
                 <marker date="1493506539000" expanded="true" signature="508:562" ph="update produ... " />
                 <marker date="1493506539000" expanded="true" signature="508:563" ph="update produ... " />
@@ -401,12 +401,12 @@
       <workItem from="1493350565419" duration="29000" />
       <workItem from="1493350612285" duration="4006000" />
       <workItem from="1493434902377" duration="5137000" />
-      <workItem from="1493505092834" duration="960000" />
+      <workItem from="1493505092834" duration="1606000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="69207000" />
+    <option name="totallyTimeSpent" value="69853000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -1282,8 +1282,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/product.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="416">
-          <caret line="95" column="39" lean-forward="false" selection-start-line="95" selection-start-column="39" selection-end-line="95" selection-end-column="39" />
+        <state relative-caret-position="371">
+          <caret line="92" column="43" lean-forward="true" selection-start-line="92" selection-start-column="43" selection-end-line="92" selection-end-column="43" />
           <folding>
             <marker date="1493506539000" expanded="true" signature="508:562" ph="update produ... " />
             <marker date="1493506539000" expanded="true" signature="508:563" ph="update produ... " />

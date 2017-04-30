@@ -22,10 +22,9 @@ public class Menu {
 	    System.out.printf("\t%-40s %-10s %n", item.getProduct().getName(), x);
 	}
 	System.out.print("\n\tPlease enter item number to remove it: ");
-	try{
-	    prID = scan.nextInt();    
-	}
-	catch (Exception ex){
+	try {
+	    prID = scan.nextInt();
+	} catch (Exception ex) {
 	    return -1;
 	}
 	return prID;
@@ -33,6 +32,28 @@ public class Menu {
 
     protected void invalidOptionMessage() {
 	System.out.println("\tPlease enter a valid number 😒");
+    }
+
+    protected Discount displayDiscountInput(ArrayList<Product> products) {
+	System.out.println("\n\n\t\t\tAvailable Discounts");
+	ArrayList<Discount> discounts = new ArrayList<Discount>();
+	int counter = 0;
+	// loop through products
+	for (Product pr : products) {
+	    // loop through discounts
+	    for (Discount disc : pr.getDiscounts()) {
+		String txt = pr.getName() +" " + disc.getPercentage() + "% discount on "+ disc.getQuantity()+pr.getType();
+		System.out.printf("\t" + "%-60s %-10s %n", txt,counter);
+		discounts.add(disc);
+		counter++;
+	    }
+	}
+	System.out.printf("\t" + "%-60s %d %n", "Back to main menu", counter);
+	System.out.println("\n\t" + String.format("%60s", "*").replace(' ', '*'));
+	int option = displayIntegerInputMessage("Your choice");
+	if (option <0 || option == counter || option >counter)
+	    return null;
+	return discounts.get(option);
     }
 
     protected void displayDiscount(ArrayList<Product> products) {
@@ -64,15 +85,15 @@ public class Menu {
 	return option;
     }
 
-    protected boolean displayYesOrNoMessage(String title){
+    protected boolean displayYesOrNoMessage(String title) {
 	char ch;
-	do{
-	    System.out.print("\t"+title+" Y/N: ");
+	do {
+	    System.out.print("\t" + title + " Y/N: ");
 	    ch = scan.nextLine().trim().charAt(0);
-	} while(ch !='y' && ch!='n');
-	return ch == 'y' ? true:false;
+	} while (ch != 'y' && ch != 'n');
+	return ch == 'y' ? true : false;
     }
-    
+
     protected int displayIntegerInputMessage(String message) {
 	int option;
 	System.out.print("\t" + message + ": ");
@@ -102,7 +123,7 @@ public class Menu {
 	for (int x = 0; x < suppliers.size(); x++) {
 	    System.out.printf("\t" + "%-40s %d %n", suppliers.get(x).getName(), x);
 	}
-	
+
 	if (back)
 	    System.out.printf("\t" + "%-40s %d %n", "Back to main menu", suppliers.size());
 	System.out.println("\n\t" + String.format("%40s", "*").replace(' ', '*'));
@@ -133,7 +154,7 @@ public class Menu {
 	}
 	return option;
     }
-    
+
     protected int displayProductsInput(ArrayList<Product> products, String title, boolean back) {
 	int option;
 	System.out.println("\n\n\t\t" + title);
