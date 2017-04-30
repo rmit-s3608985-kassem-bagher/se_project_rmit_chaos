@@ -76,14 +76,14 @@ CREATE INDEX order_item_product_prod_id_fk
 
 CREATE TABLE supermarket.product
 (
-  prod_id              INT                      NOT NULL auto_increment
+  prod_id              INT                           NOT NULL auto_increment
   PRIMARY KEY,
-  prod_name            VARCHAR(200)             NULL,
-  prod_unit_price      DECIMAL DEFAULT '0'      NULL,
-  prod_stock_level     INT                      NULL,
-  prod_replenish_level INT                      NULL,
-  prod_type            VARCHAR(3) DEFAULT 'pcs' NULL,
-  supplier             INT                      NULL
+  prod_name            VARCHAR(200)                  NULL,
+  prod_unit_price      DECIMAL(10, 2) DEFAULT '0.00' NULL,
+  prod_stock_level     INT                           NULL,
+  prod_replenish_level INT                           NULL,
+  prod_type            VARCHAR(3) DEFAULT 'pcs'      NULL,
+  supplier             INT                           NULL
 );
 
 CREATE INDEX product_supplier_id_fk
