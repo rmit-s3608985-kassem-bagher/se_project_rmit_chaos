@@ -14,6 +14,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 
 import au.edu.rmit.chaos.menu.CustomerMenu;
 import au.edu.rmit.chaos.menu.LoginMenu;
+import au.edu.rmit.chaos.menu.ManagerMenu;
 import au.edu.rmit.chaos.menu.SalesStaffMenu;
 
 public class Company {
@@ -23,6 +24,7 @@ public class Company {
     private CustomerMenu cuMenu;
     private SalesStaffMenu sMenu;
     private WarehouseMenu wMenu;
+    private ManagerMenu mMenu;
 
     final static String operatingSystem = System.getProperty("os.name");
 
@@ -102,6 +104,10 @@ public class Company {
 		    else if (comp.employee.getRole() == EmployeeRole.warehouse) {
 			comp.wMenu = new WarehouseMenu(comp.employee);
 			comp.wMenu.display();
+		    }
+		    else if (comp.employee.getRole() == EmployeeRole.manager) {
+			comp.mMenu = new ManagerMenu(comp.employee);
+			comp.mMenu.display();
 		    }
 		}
 	    }

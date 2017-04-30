@@ -21,7 +21,7 @@ public class WarehouseMenu {
     }
 
     private void returnToMainMenu() {
-	System.out.println("\n\n\tPress return to go back to main menu...");
+	System.out.println("\n\n\tPress return to continue...");
 	scan.nextLine();
     }
 
@@ -59,8 +59,8 @@ public class WarehouseMenu {
 
 	    Product pr = products.get(option);
 	    System.out.printf("%n\tThere are %d %s of %s %n", pr.getStockLevel(),pr.getType().toString(), pr.getName());
-	    System.out.println("\n\tPress return to go back...");
-	    scan.nextLine();
+	    returnToMainMenu();
+	    return;
 	} while (true);
     }
 
