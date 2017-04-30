@@ -1,28 +1,28 @@
 CREATE TABLE supermarket.customer
 (
-  cust_id       INT                 NOT NULL auto_increment
+  cust_id       INT                           NOT NULL auto_increment
   PRIMARY KEY,
-  cust_name     VARCHAR(200)        NULL,
-  cust_balance  DECIMAL DEFAULT '0' NULL,
-  cust_points   INT DEFAULT '0'     NULL,
-  cust_username VARCHAR(50)         NULL,
-  cust_password VARCHAR(256)        NULL,
+  cust_name     VARCHAR(200)                  NULL,
+  cust_balance  DECIMAL(10, 2) DEFAULT '0.00' NULL,
+  cust_points   INT DEFAULT '0'               NULL,
+  cust_username VARCHAR(50)                   NULL,
+  cust_password VARCHAR(256)                  NULL,
   CONSTRAINT customer_cust_username_uindex
   UNIQUE (cust_username)
 );
 
 CREATE TABLE supermarket.customer_order
 (
-  order_id       INT                 NOT NULL auto_increment
+  order_id       INT                           NOT NULL auto_increment
   PRIMARY KEY,
-  customer       INT                 NULL,
-  order_date     MEDIUMTEXT          NULL,
-  order_subtotal DECIMAL DEFAULT '0' NULL,
-  order_total    DECIMAL DEFAULT '0' NULL,
-  order_status   VARCHAR(20)         NULL,
-  order_discount DOUBLE DEFAULT '0'  NULL,
-  order_points   INT DEFAULT '0'     NULL,
-  bonus_points   INT DEFAULT '0'     NULL,
+  customer       INT                           NULL,
+  order_date     MEDIUMTEXT                    NULL,
+  order_subtotal DECIMAL(10, 2) DEFAULT '0.00' NULL,
+  order_total    DECIMAL(10, 2) DEFAULT '0.00' NULL,
+  order_status   VARCHAR(20)                   NULL,
+  order_discount DECIMAL(10, 2) DEFAULT '0.00' NULL,
+  order_points   INT DEFAULT '0'               NULL,
+  bonus_points   INT DEFAULT '0'               NULL,
   CONSTRAINT customer_order_customer_cust_id_fk
   FOREIGN KEY (customer) REFERENCES supermarket.customer (cust_id)
 );
@@ -59,11 +59,11 @@ warehouse';
 
 CREATE TABLE supermarket.order_item
 (
-  cust_order    INT                 NULL,
-  product       INT                 NULL,
-  item_quantity INT                 NULL,
-  item_total    INT                 NULL,
-  item_discount DECIMAL DEFAULT '0' NULL,
+  cust_order    INT                           NULL,
+  product       INT                           NULL,
+  item_quantity INT                           NULL,
+  item_total    INT                           NULL,
+  item_discount DECIMAL(10, 2) DEFAULT '0.00' NULL,
   CONSTRAINT order_item_order_id_fk
   FOREIGN KEY (cust_order) REFERENCES supermarket.customer_order (order_id)
 );
@@ -116,10 +116,10 @@ CREATE INDEX purchase_order_supplier_id_fk
 
 CREATE TABLE supermarket.purchase_order_item
 (
-  purchase_order INT                 NULL,
-  product        INT                 NULL,
-  item_quantity  INT                 NULL,
-  item_total     DECIMAL DEFAULT '0' NULL,
+  purchase_order INT                           NULL,
+  product        INT                           NULL,
+  item_quantity  INT                           NULL,
+  item_total     DECIMAL(10, 2) DEFAULT '0.00' NULL,
   CONSTRAINT purchase_order_item_purchase_order_prd__id_fk
   FOREIGN KEY (purchase_order) REFERENCES supermarket.purchase_order (prd__id)
 );
