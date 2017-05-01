@@ -11,5 +11,6 @@ $r->addAPIClass('supplier');
 $r->addAPIClass('product');
 $r->addAPIClass('purchaseorder');
 $r->addAPIClass('order');
+$r->addAPIClass('report');
 $r->addAuthenticationClass("authentication");
 $r->handle();
