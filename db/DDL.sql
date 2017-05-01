@@ -145,3 +145,20 @@ ALTER TABLE purchase_order
   ADD CONSTRAINT purchase_order_supplier_id_fk
 FOREIGN KEY (supplier) REFERENCES supermarket.supplier (sup_id);
 
+CREATE VIEW supermarket.report_best_selling AS
+  SELECT
+  `supermarket`.`product`.`prod_name` AS `product`,
+  sum(`supermarket`.`order_item`.`item_total`) AS `sales`
+FROM (`supermarket`.`order_item`
+JOIN `supermarket`.`product` ON ((`supermarket`.`order_item`.`product` = `supermarket`.`product`.`prod_id`)))
+GROUP BY `supermarket`.`order_item`.`product`
+ORDER BY sum(`supermarket`.`order_item`.`item_total`) DESC
+LIMIT 5;
+
+CREATE VIEW supermarket.report_sales AS
+  SELECT date_format(from_unixtime(`co`.`order_date`), '%d-%m-%Y') AS `new_date`,
+  sum(`co`.`order_total`) AS `sales`
+FROM `supermarket`.`customer_order` `co`
+WHERE (`co`.`order_date` IS NOT NULL )
+GROUP BY DATE_FORMAT (from_unixtime(`co`.`order_date`), '%d-%m-%Y') DESC;
+
