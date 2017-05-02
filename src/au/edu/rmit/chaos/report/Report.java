@@ -11,6 +11,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import static net.sf.dynamicreports.report.builder.DynamicReports.*;
 
 import net.sf.dynamicreports.report.builder.chart.LineChartBuilder;
+import net.sf.dynamicreports.report.builder.column.TextColumnBuilder;
 import net.sf.dynamicreports.report.builder.style.StyleBuilder;
 import net.sf.dynamicreports.report.constant.HorizontalTextAlignment;
 import net.sf.dynamicreports.report.exception.*;
@@ -120,6 +121,9 @@ public class Report {
                 .setBorder(stl.pen1Point())
                 .setBackgroundColor(Color.LIGHT_GRAY);
 
+        TextColumnBuilder<String> dateColumn = col.column("Date", "new_date", type.stringType());
+        TextColumnBuilder<Double> salesColumn = col.column("Sales $", "sales", type.doubleType());
+
         try {
             report()
                     .setColumnTitleStyle(columnTitleStyle)
@@ -127,6 +131,13 @@ public class Report {
                     .columns(col.column("Date", "new_date", type.stringType()),
                             col.column("Sales $", "sales", type.doubleType()))
                     .title(cmp.text("Sales Report from: " + from + " to " + to + "\n").setStyle(boldCenteredStyle))
+                    .summary(
+                            cht.lineChart()
+                                    .setTitle("\n\nSales")
+                                    .setCategory(dateColumn)
+                                    .series(cht.serie(salesColumn))
+                                    .setCategoryAxisFormat(cht.axisFormat().setLabel("Date")))
+
                     .setDataSource(dr)
                     .pageFooter(cmp.pageXofY())
                     .show(false);
