@@ -99,11 +99,11 @@ FOREIGN KEY (product) REFERENCES supermarket.product (prod_id);
 
 CREATE TABLE supermarket.purchase_order
 (
-  prd__id  INT        NOT NULL auto_increment
-  PRIMARY KEY,
   prd_date MEDIUMTEXT NULL,
   employee INT        NULL,
   supplier INT        NULL,
+  prd_id   INT        NOT NULL auto_increment
+  PRIMARY KEY,
   CONSTRAINT purchase_order_employee_id_fk
   FOREIGN KEY (employee) REFERENCES supermarket.employee (emp_id)
 );
@@ -121,11 +121,16 @@ CREATE TABLE supermarket.purchase_order_item
   item_quantity  INT                           NULL,
   item_total     DECIMAL(10, 2) DEFAULT '0.00' NULL,
   CONSTRAINT purchase_order_item_purchase_order_prd__id_fk
-  FOREIGN KEY (purchase_order) REFERENCES supermarket.purchase_order (prd__id)
+  FOREIGN KEY (purchase_order) REFERENCES supermarket.purchase_order (prd_id),
+  CONSTRAINT purchase_order_item_product_prod_id_fk
+  FOREIGN KEY (product) REFERENCES supermarket.product (prod_id)
 );
 
 CREATE INDEX purchase_order_item_purchase_order_prd__id_fk
   ON purchase_order_item (purchase_order);
+
+CREATE INDEX purchase_order_item_product_prod_id_fk
+  ON purchase_order_item (product);
 
 CREATE TABLE supermarket.supplier
 (
@@ -161,4 +166,19 @@ CREATE VIEW supermarket.report_sales AS
 FROM `supermarket`.`customer_order` `co`
 WHERE (`co`.`order_date` IS NOT NULL )
 GROUP BY DATE_FORMAT (from_unixtime(`co`.`order_date`), '%d-%m-%Y') DESC;
+
+CREATE VIEW supermarket.report_supply AS
+  SELECT
+  `supermarket`.`purchase_order`.`prd_id` AS `prd_id`,
+DATE_FORMAT (from_unixtime(`supermarket`.`purchase_order`.`prd_date`), '%d-%m-%Y') AS `order_date`,
+  `sp`.`sup_name` AS `sup_name`,
+  `prod`.`prod_name` AS `prod_name`,
+  `item`.`item_quantity` AS `item_quantity`,
+  `item`.`item_total` AS `item_total`
+FROM (((`supermarket`.`purchase_order`
+JOIN `supermarket`.`purchase_order_item` `item`
+ON ((`supermarket`.`purchase_order`.`prd_id` = `item`.`purchase_order`))) JOIN `supermarket`.`supplier` `sp`
+ON ((`supermarket`.`purchase_order`.`supplier` = `sp`.`sup_id`))) JOIN `supermarket`.`product` `prod`
+ON ((`item`.`product` = `prod`.`prod_id`)))
+ORDER BY DATE_FORMAT (from_unixtime(`supermarket`.`purchase_order`.`prd_date`), '%d-%m-%Y') DESC;
 
