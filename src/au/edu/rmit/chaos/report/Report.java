@@ -7,6 +7,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+
 import static net.sf.dynamicreports.report.builder.DynamicReports.*;
 
 import net.sf.dynamicreports.report.builder.chart.LineChartBuilder;
@@ -15,6 +16,7 @@ import net.sf.dynamicreports.report.constant.HorizontalTextAlignment;
 import net.sf.dynamicreports.report.exception.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.json.JSONObject;
+
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +26,33 @@ import java.util.List;
  * Created by kassem on 1/5/17.
  */
 public class Report {
+
+
+    private ArrayList<Supply> fetchSupplyFromServer() {
+        HttpResponse<JsonNode> request = null;
+        try {
+            request = Unirest
+                    .get("http://localhost/supermarket/api.php/report/supply")
+                    .header("accept", "application/json")
+                    .queryString("key", "519428fdced64894bb10cd90bd87167c")
+                    .asJson();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return null;
+        }
+        // retrieve the parsed JSONObject from the response
+        if (!request.getBody().isArray()) {
+            JSONObject json = request.getBody().getObject();
+            if (json.has("error"))
+                System.err.println(json.getJSONObject("error").getString("message"));
+            return null;
+        }
+        Gson gson = new Gson();
+        ArrayList<Supply> Supplies = gson.fromJson(request.getBody().getArray().toString(),
+                new TypeToken<List<Supply>>() {
+                }.getType());
+        return Supplies;
+    }
 
     private ArrayList<BestSelling> fetchBestSellingFromServer() {
         HttpResponse<JsonNode> request = null;
@@ -80,9 +109,9 @@ public class Report {
     }
 
 
-    public void salesReport(String from,String to) {
+    public void salesReport(String from, String to) {
 
-        JRBeanCollectionDataSource dr = new JRBeanCollectionDataSource(fetchSalesFromServer(from,to));
+        JRBeanCollectionDataSource dr = new JRBeanCollectionDataSource(fetchSalesFromServer(from, to));
 
         StyleBuilder boldStyle = stl.style().bold();
         StyleBuilder boldCenteredStyle = stl.style(boldStyle)
@@ -97,7 +126,37 @@ public class Report {
                     .highlightDetailEvenRows()
                     .columns(col.column("Date", "new_date", type.stringType()),
                             col.column("Sales $", "sales", type.doubleType()))
-                    .title(cmp.text("Sales Report from: "+from+" to "+ to +"\n").setStyle(boldCenteredStyle))
+                    .title(cmp.text("Sales Report from: " + from + " to " + to + "\n").setStyle(boldCenteredStyle))
+                    .setDataSource(dr)
+                    .pageFooter(cmp.pageXofY())
+                    .show(false);
+        } catch (DRException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void supplyReport() {
+        JRBeanCollectionDataSource dr = new JRBeanCollectionDataSource(fetchSupplyFromServer());
+
+        StyleBuilder boldStyle = stl.style().bold();
+        StyleBuilder boldCenteredStyle = stl.style(boldStyle)
+                .setHorizontalTextAlignment(HorizontalTextAlignment.CENTER);
+        StyleBuilder columnTitleStyle = stl.style(boldCenteredStyle)
+                .setBorder(stl.pen1Point())
+                .setBackgroundColor(Color.LIGHT_GRAY);
+
+        try {
+            report()
+                    .setColumnTitleStyle(columnTitleStyle)
+                    .highlightDetailEvenRows()
+                    .columns(col.column("Purchase Order #", "purchase_order_id", type.integerType()).setStyle(stl.style().setHorizontalTextAlignment(HorizontalTextAlignment.LEFT)),
+                            col.column("Date", "order_date", type.stringType()),
+                            col.column("Supplier", "sup_name", type.stringType()),
+                            col.column("Product", "prod_name", type.stringType()),
+                            col.column("Qty", "item_quantity", type.integerType()),
+                            col.column("Total $", "item_total", type.doubleType()))
+                    .title(cmp.text("Supply Report\n").setStyle(boldCenteredStyle))
                     .setDataSource(dr)
                     .pageFooter(cmp.pageXofY())
                     .show(false);

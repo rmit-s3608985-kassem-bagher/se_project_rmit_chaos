@@ -2,7 +2,7 @@ package au.edu.rmit.chaos.menu;
 
 import java.util.ArrayList;
 import java.util.Scanner;
-import net.sf.dynamicreports.report.exception.*;
+
 import au.edu.rmit.chaos.*;
 import au.edu.rmit.chaos.report.Report;
 
@@ -217,7 +217,8 @@ public class ManagerMenu extends Menu {
             } else if (option == 5) {
                 salesReport();
             } else if (option == 6) {
-                // System.exit(0);
+                Report report = new Report();
+                report.supplyReport();
             } else if (option == 7) {
                 Report report = new Report();
                 report.bestSellingReport();
